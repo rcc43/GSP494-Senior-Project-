@@ -45,6 +45,8 @@ public class Script_BuffList : MonoBehaviour {
             buffs.Remove(oldestBuff); //removes the oldest buff.
         }
         buffs.Add(newBuff); //adds the new buff.
+        newBuff.ApplyBuffEffect(gameObject);
+        newBuff.triggered = true;
     }
 
 

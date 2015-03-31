@@ -3,13 +3,18 @@ using System.Collections.Generic;
 
 public class Script_Tower : MonoBehaviour {
 
+    LineRenderer projector;
+
     public GameObject GameController;
     public GameObject[] weapons;
     public float range = 15.0f;
 
+    public int numPoints = 10;
+
     public float damage = 10.0f;
 
     public bool stunned = false;
+    public bool selected = false;
     
     Script_Weapon[] weaponTargeting;
     Script_GameController controller;
@@ -25,12 +30,51 @@ public class Script_Tower : MonoBehaviour {
         {
             weaponTargeting[i] = weapons[i].GetComponent<Script_Weapon>();
         }
+
+        projector = gameObject.AddComponent<LineRenderer>();
+        projector.SetVertexCount(numPoints + 1);
+        projector.material = new Material(Shader.Find("Particles/Additive"));
+        projector.SetColors(Color.green, Color.green);
+        projector.SetWidth(.1f, .1f);
+
         UpdateStats();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
+        bool selectHit = false;
+        var ray = Camera.main.ScreenPointToRay(Input.mousePosition); //raycasts from the camera to the mouse.
+
+        RaycastHit[] hits; //scans through all hits from the raycast.
+        hits = Physics.RaycastAll(ray);
+
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i].transform.gameObject == gameObject) //if the raycast hits a tower...
+            {
+                if (!controller.building)
+                {
+                     selectHit = true;
+                }
+            }
+        }
+
+        if (Input.GetButton("Fire1"))
+        {
+            if (selectHit)
+            {
+                selected = true;
+            }
+            else selected = false;
+        }
+
+        if (selected)
+        {
+            projector.enabled = true;
+        }
+        else projector.enabled = false;
+
         targets.Clear();
         List<GameObject> potentialTargets = new List<GameObject>();
         for (int i = 0; i < controller.GetEnemies().Count; i++)
@@ -43,6 +87,13 @@ public class Script_Tower : MonoBehaviour {
             }
         }
         Fire();
+
+        int index = 0;
+        for (float i = 0f; index < numPoints; i = i + ((Mathf.PI * 2) / numPoints))
+        {
+            projector.SetPosition(index++, new Vector3(transform.position.x + range * Mathf.Sin(i), transform.position.y + .5f, transform.position.z + range * Mathf.Cos(i)));
+        }
+        projector.SetPosition(index++, new Vector3(transform.position.x + range * Mathf.Sin(0.0f), transform.position.y + .5f, transform.position.z + range * Mathf.Cos(0.0f)));
 	}
 
     void UpdateStats()

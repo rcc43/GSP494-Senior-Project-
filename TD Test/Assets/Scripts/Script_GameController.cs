@@ -13,20 +13,28 @@ public class Script_GameController : MonoBehaviour {
 
     public bool building = false; //whether or not the cursor is currently placing a tower.
 
+    public float wavePause = 3.0f; //time between waves.
+    float waveTimer = 0;
+
     List<GameObject> towers = new List<GameObject>(); //a list of towers in the game.
     List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
 
 	// Use this for initialization
 	void Start ()
     {
-        SpawnBaseEnemy(); //spawns a test enemy.
-        //SpawnBaseEnemy();
-        //SpawnBaseEnemy();
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
+        waveTimer -= Time.deltaTime;
+
+        if (waveTimer <= 0)
+        {
+            SpawnBaseEnemy(); //spawns a test dummy.
+            waveTimer = wavePause;
+        }
+      
         if (Input.GetKey("1")) //if 1 key is pressed and there isn't already a tower being built...
         {
             if (!building)
