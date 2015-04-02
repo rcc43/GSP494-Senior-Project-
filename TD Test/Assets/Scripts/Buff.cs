@@ -23,6 +23,31 @@ public class Buff
     public int allowedStacks = 1; //number of stacks of this type of buff allowed.
 
 
+    public Buff()
+    {
+        type = buffType.doNothing;
+        magnitude = 0.0f;
+        duration = 0.0f;
+        DOTtimer = 0.0f;
+        repeating = false;
+        triggered = false;
+        allowedStacks = 1;
+    }
+
+    public Buff(Buff other)
+    {
+        if (other != null)
+        {
+            this.type = other.type;
+            this.magnitude = other.magnitude;
+            this.duration = other.duration;
+            this.DOTtimer = other.DOTtimer;
+            this.repeating = other.repeating;
+            this.triggered = other.triggered;
+            this.allowedStacks = other.allowedStacks;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -41,32 +66,39 @@ public class Buff
         Script_Enemy_Health enemyStats = target.GetComponent<Script_Enemy_Health>(); //the health script for an enemy.
         Script_Tower towerStats = target.GetComponent<Script_Tower>(); //the script for a tower.
 
-        switch (type)
+        if (duration > 0)
         {
-            case buffType.EnemyReduceSpeedPercent:
-                {
-                    if (enemyMove != null)
+            switch (type)
+            {
+                case buffType.doNothing:
                     {
-                        enemyMove.speed *= ((100 - magnitude) / 100); //reduces the enemy's current speed.
+                        break;
                     }
-                }
-                break;
-            case buffType.EnemyStun:
-                {
-                    if (enemyMove != null)
+                case buffType.EnemyReduceSpeedPercent:
                     {
-                        enemyMove.stunned = true; //stun the enemy
+                        if (enemyMove != null)
+                        {
+                            enemyMove.speed *= ((100 - magnitude) / 100); //reduces the enemy's current speed.
+                        }
                     }
-                }
-                break;
-            case buffType.TowerStun:
-                {
-                    if (enemyMove != null) 
+                    break;
+                case buffType.EnemyStun:
                     {
-                        towerStats.stunned = true; //stun the tower.
+                        if (enemyMove != null)
+                        {
+                            enemyMove.stunned = true; //stun the enemy
+                        }
                     }
-                }
-                break;
+                    break;
+                case buffType.TowerStun:
+                    {
+                        if (enemyMove != null)
+                        {
+                            towerStats.stunned = true; //stun the tower.
+                        }
+                    }
+                    break;
+            }
         }
     }
 
@@ -80,6 +112,10 @@ public class Buff
 
         switch (type)
         {
+            case buffType.doNothing:
+                    {
+                        break;
+                    }
             case buffType.EnemyReduceSpeedPercent:
                 {
                     if (enemyMove != null)

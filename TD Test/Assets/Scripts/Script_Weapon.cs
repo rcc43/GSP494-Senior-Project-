@@ -6,6 +6,8 @@ public class Script_Weapon : MonoBehaviour {
     public GameObject shotPrefab; //the shot the weapon will fire.
     public float fireRate; //the fire rate of the weapon.
 
+    public Buff buff;
+
     float damage; //the damage the weapon will deal.
     GameObject target; //the target of the weapon.
     float cooldown; //the cooldown timer for the weapon.
@@ -45,6 +47,7 @@ public class Script_Weapon : MonoBehaviour {
     }
 
     //targeted variation of the fire weapon function. Same as the non-targeted version, but takes an external target.
+
     public void Fire(GameObject tgt)
     {
         if (cooldown <= 0)
@@ -54,6 +57,11 @@ public class Script_Weapon : MonoBehaviour {
             shotData.SetDamage(damage);
             shotData.SetTarget(tgt);
             cooldown = fireRate;
+            if (buff != null)
+            {
+                Buff newBuff = new Buff(buff);
+                shotData.buff = newBuff;
+            }
         }
     }
 }

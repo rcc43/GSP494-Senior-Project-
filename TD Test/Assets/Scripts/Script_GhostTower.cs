@@ -3,9 +3,15 @@ using System.Collections;
 
 public class Script_GhostTower : MonoBehaviour {
 
+    LineRenderer projector;
+
     public GameObject spawnedTower; //prefab of the tower that is created by this ghost.
     public float alpha = .5f; //the transparency of the ghost.
     public float height = 1.0f; //the height of the tower (so that the ghost doesn't clip through the ground).
+
+    public float range = 15;
+
+    public int numPoints = 50;
 
     bool foundLocation; //varaible denoting when the ghost is over a viable build location.
     Script_GameController controller; //reference to the gamecontroller.
@@ -23,6 +29,13 @@ public class Script_GhostTower : MonoBehaviour {
         Color color = gameObject.renderer.material.color; //sets alpha to alpha value.
         color.a = alpha;
         gameObject.renderer.material.color = color;
+
+        projector = gameObject.AddComponent<LineRenderer>();
+        projector.SetVertexCount(numPoints + 1);
+        projector.material = new Material(Shader.Find("Particles/Additive"));
+        projector.SetColors(Color.green, Color.green);
+        projector.SetWidth(.1f, .1f);
+
 	}
 	
 	// Update is called once per frame
@@ -58,12 +71,20 @@ public class Script_GhostTower : MonoBehaviour {
                 if (groundTarget.tower == null)
                 {
                     GameObject newTower = Instantiate(spawnedTower, transform.position, transform.rotation) as GameObject; //if not, builds a tower at this location.
+                    groundTarget.tower = newTower;
                     Destroy(gameObject);
                     controller.building = false;
                     controller.GetTowers().Add(newTower);
                 }
             }
         }
+
+        int index = 0;
+        for (float i = 0f; index < numPoints; i = i + ((Mathf.PI * 2) / numPoints))
+        {
+            projector.SetPosition(index++, new Vector3(transform.position.x + range * Mathf.Sin(i), transform.position.y + .5f, transform.position.z + range * Mathf.Cos(i)));
+        }
+        projector.SetPosition(index++, new Vector3(transform.position.x + range * Mathf.Sin(0.0f), transform.position.y + .5f, transform.position.z + range * Mathf.Cos(0.0f)));
 	
 	}
 }

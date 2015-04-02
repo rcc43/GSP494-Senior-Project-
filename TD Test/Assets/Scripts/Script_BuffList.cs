@@ -14,9 +14,10 @@ public class Script_BuffList : MonoBehaviour {
 	void Update ()
     {
         //updates each buff.
-        foreach (Buff buff in buffs)
+
+        for (int i = 0; i < buffs.Count; i++)
         {
-            buff.BuffUpdate(gameObject);
+            buffs[i].BuffUpdate(gameObject);
         }
 	}
 
@@ -24,29 +25,32 @@ public class Script_BuffList : MonoBehaviour {
     //adds a buff to the buff list.
     public void AddBuff(Buff newBuff)
     {
-        Buff targetBuff; //other buffs in the buff list, checked to see if they have the same effect.
-        int stacks = 0; //the number of times a given effect appears in the buff list.
-        int allowed = newBuff.allowedStacks; //the allowed number of stacked buffs.
-        for (int i = 0; i < buffs.Count; i++) //cycles through all present buffs.
+        if (newBuff.duration > 0)
         {
-            targetBuff = buffs[i];
-            if (targetBuff.type == newBuff.type) //if the current buff has the same effect as the buff being applied, increments stacks.
+            Buff targetBuff; //other buffs in the buff list, checked to see if they have the same effect.
+            int stacks = 0; //the number of times a given effect appears in the buff list.
+            int allowed = newBuff.allowedStacks; //the allowed number of stacked buffs.
+            for (int i = 0; i < buffs.Count; i++) //cycles through all present buffs.
             {
-                stacks ++;
+                targetBuff = buffs[i];
+                if (targetBuff.type == newBuff.type) //if the current buff has the same effect as the buff being applied, increments stacks.
+                {
+                    stacks++;
+                }
             }
-        }
-        if (stacks + 1 > allowed) //if adding this buff will exceed the number of allowed buffs...
-        {
-            Buff oldestBuff = OldestBuffofType(newBuff.type); //gets the oldest buff applied of this type.
-            if (oldestBuff.triggered == true) //oldest buff has activated, it gets deactivated.
+            if (stacks + 1 > allowed) //if adding this buff will exceed the number of allowed buffs...
             {
-                oldestBuff.BuffEnd(gameObject);
+                Buff oldestBuff = OldestBuffofType(newBuff.type); //gets the oldest buff applied of this type.
+                if (oldestBuff.triggered == true) //oldest buff has activated, it gets deactivated.
+                {
+                    oldestBuff.BuffEnd(gameObject);
+                }
+                buffs.Remove(oldestBuff); //removes the oldest buff.
             }
-            buffs.Remove(oldestBuff); //removes the oldest buff.
+            buffs.Add(newBuff); //adds the new buff.
+            newBuff.ApplyBuffEffect(gameObject);
+            newBuff.triggered = true;
         }
-        buffs.Add(newBuff); //adds the new buff.
-        newBuff.ApplyBuffEffect(gameObject);
-        newBuff.triggered = true;
     }
 
 
