@@ -41,9 +41,10 @@ public class Script_Enemy_Move : MonoBehaviour {
         //finds the distance between it and the center of the target road piece. if it is close...
         if (Vector3.Distance((tgt.transform.position + new Vector3(0.0f, aboveHeight, 0.0f)), transform.position) < tgtRoad.turnProximity)
         {
-            if (tgtRoad.next != null) //checks if the target road points to a new road piece.
+            int rand = Random.Range(0, tgtRoad.numBranches);
+            if (tgtRoad.next[rand] != null) //checks if the target road points to a new road piece.
             {
-                tgt = tgtRoad.next; //if so, sets that piece as the new target, gets its script.
+                tgt = tgtRoad.next[rand]; //if so, sets that piece as the new target, gets its script.
                 tgtRoad = tgt.GetComponent<Script_Road>();
             }
         }

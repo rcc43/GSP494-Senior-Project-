@@ -34,8 +34,8 @@ public class Script_Weapon : MonoBehaviour {
         target = tgt;
     }
 
-    //fires the weapon.
-    public void Fire()
+    //fires the weapon. Returns true if the weapon actually fired, false if it hasn't cooled down.
+    public bool Fire()
     {
         if (cooldown <= 0) //if the weapon is ready to fire.
         {
@@ -43,12 +43,14 @@ public class Script_Weapon : MonoBehaviour {
             shot.SetDamage(damage); //sets shot's damage to the weapon's damage.
             shot.SetTarget(target); //sets shot's target to the weapon's target.
             cooldown = fireRate; //resets the cooldown.
+            return true;
         }
+        return false;
     }
 
     //targeted variation of the fire weapon function. Same as the non-targeted version, but takes an external target.
 
-    public void Fire(GameObject tgt)
+    public bool Fire(GameObject tgt)
     {
         if (cooldown <= 0)
         {
@@ -62,6 +64,8 @@ public class Script_Weapon : MonoBehaviour {
                 Buff newBuff = new Buff(buff);
                 shotData.buff = newBuff;
             }
+            return true;
         }
+        return false;
     }
 }

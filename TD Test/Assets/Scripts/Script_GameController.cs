@@ -10,6 +10,7 @@ public class Script_GameController : MonoBehaviour {
     public GameObject ghostBaseTower; //the prefab for the test tower placement ghost.
 
     public GameObject SpawnRoad; //the road where the enemy will spawn.
+    public Vector3 spawnMove; //this is the direction entities will move upon spawning.
 
     public bool building = false; //whether or not the cursor is currently placing a tower.
 
@@ -18,15 +19,23 @@ public class Script_GameController : MonoBehaviour {
 
     List<GameObject> towers = new List<GameObject>(); //a list of towers in the game.
     List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
+    GameObject[] ground;
 
 	// Use this for initialization
 	void Start ()
     {
+        ground = GameObject.FindGameObjectsWithTag("Ground");
+        Script_Road spawnRoadTile = SpawnRoad.GetComponent<Script_Road>();
+        if (spawnRoadTile != null)
+        {
+            spawnRoadTile.FindNext(spawnMove);
+        }
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
+
         waveTimer -= Time.deltaTime;
 
         if (waveTimer <= 0)
@@ -42,6 +51,10 @@ public class Script_GameController : MonoBehaviour {
                 building = true; //sets building to true, creates placement ghost.
                 Instantiate(ghostBaseTower);
             }
+        }
+        if (Input.GetKey("2"))
+        {
+            DestroyTowers();
         }
 	}
 
@@ -73,5 +86,18 @@ public class Script_GameController : MonoBehaviour {
         enemies.Add(newEnemy); //adds the enemy to the enemy list.
     }
 
+
+    void DestroyTowers()
+    {
+        for (int i = 0; i < ground.Length; i++)
+        {
+            Script_Ground groundScript = ground[i].GetComponent<Script_Ground>();
+            if (groundScript != null)
+            {
+                Destroy(groundScript.tower);
+                groundScript.tower = null;
+            }
+        }
+    }
 
 }
