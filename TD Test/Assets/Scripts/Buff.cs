@@ -173,5 +173,19 @@ public class Buff
         }
         duration -= Time.deltaTime; //reduces the buff's duration.
     }
+
+    public string ParseToString()
+    {
+        string answer = " ";
+        switch (type)
+        {
+            case (buffType.EnemyReduceSpeedPercent):
+                {
+                    answer = "Slow: " + magnitude.ToString() + "%, " + duration.ToString("F1") + "s";
+                    break;
+                }
+        }
+        return answer;
+    }
 }
 

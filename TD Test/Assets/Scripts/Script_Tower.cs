@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 public class Script_Tower : MonoBehaviour {
 
+    public string towerName = "Generic Tower";
+
+    public string description = "This is a generic test tower";
+
+    public int cost = 300;
+
     LineRenderer projector;
 
     public AudioClip fire;
@@ -52,6 +58,7 @@ public class Script_Tower : MonoBehaviour {
         {
             weaponTargeting[i] = weapons[i].GetComponent<Script_Weapon>();
         }
+
 
         projector = gameObject.AddComponent<LineRenderer>();
         projector.SetVertexCount(numPoints + 1);
@@ -105,10 +112,13 @@ public class Script_Tower : MonoBehaviour {
         for (int i = 0; i < controller.GetEnemies().Count; i++)
         {
             GameObject tgt = controller.GetEnemies()[i];
-            float dist = Vector3.Distance(transform.position, tgt.transform.position);
-            if (dist < range)
+            if (tgt != null)
             {
-                targets.Add(tgt);
+                float dist = Vector3.Distance(transform.position, tgt.transform.position);
+                if (dist < range)
+                {
+                    targets.Add(tgt);
+                }
             }
         }
         Fire();
@@ -202,7 +212,7 @@ public class Script_Tower : MonoBehaviour {
         Vector3 displayPos = Camera.main.WorldToScreenPoint(transform.position);
         displayPos.x += infoCard_offsetX;
         displayPos.y = Screen.height - (displayPos.y - infoCard_offsetY);
-        GUI.Box(new Rect(displayPos.x, displayPos.y, infoCard_width, infoCard_height), gameObject.name);
+        GUI.Box(new Rect(displayPos.x, displayPos.y, infoCard_width, infoCard_height), towerName);
         //displays current damage
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Damage: ");
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), damage.ToString("F1"));
@@ -210,7 +220,7 @@ public class Script_Tower : MonoBehaviour {
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), (damage * damageUpgradeCurve).ToString("F1"));
         //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (range * 2).ToString("F1")))
+        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
         {
             damage = damage * damageUpgradeCurve;
             GUIReserveHit = true;
@@ -224,7 +234,7 @@ public class Script_Tower : MonoBehaviour {
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .5f, infoCard_height * .5f), (range * rangeUpgradeCurve).ToString("F1"));
         //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (range * 2).ToString("F1")))
+        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
         {
             range = range * rangeUpgradeCurve;
             GUIReserveHit = true;
@@ -238,7 +248,7 @@ public class Script_Tower : MonoBehaviour {
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), (fireRate * fireRateUpgradeCurve).ToString("F1"));
         //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (fireRate / 2).ToString("F1")))
+        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
         {
             fireRate = fireRate * fireRateUpgradeCurve;
             GUIReserveHit = true;

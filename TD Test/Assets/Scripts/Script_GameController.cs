@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 
@@ -7,7 +8,8 @@ public class Script_GameController : MonoBehaviour {
 
     public GameObject baseEnemy; //the prefab for the test enemy class.
 
-    public GameObject ghostBaseTower; //the prefab for the test tower placement ghost.
+    public GameObject[] towerGhostPrefabs; //the prefab for the test tower placement ghost.
+    public GameObject[] towerPrefabs;
 
     public GameObject SpawnRoad; //the road where the enemy will spawn.
     public Vector3 spawnMove; //this is the direction entities will move upon spawning.
@@ -21,6 +23,31 @@ public class Script_GameController : MonoBehaviour {
     List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
     GameObject[] ground;
 
+    //UI Elements;
+
+    public Canvas UICanvas;
+    public GameObject baseBar;
+    GameObject sidebar;
+    GameObject bottomBar;
+
+    int BuildButtons_X;
+    public int BuildButtons_StartY;
+    public int BuildButtons_Space;
+
+    int towerBuildButton_Width;
+    public int towerBuildButton_Height;
+
+    public int sidebar_width;
+    public int sidebar_height;
+
+    public int bottom_width;
+    public int bottom_height;
+
+    public int sideButton_offset;
+
+    public GameObject towerBuildButton_prefab;
+    GameObject[] towerBuildButton;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -30,6 +57,25 @@ public class Script_GameController : MonoBehaviour {
         {
             spawnRoadTile.FindNext(spawnMove);
         }
+
+        sidebar = Instantiate(baseBar) as GameObject;
+        RectTransform sideTrans = sidebar.GetComponent<RectTransform>();
+        sideTrans.SetParent(UICanvas.transform);
+        sideTrans.sizeDelta = new Vector2(sidebar_width, sidebar_height);
+        sideTrans.anchoredPosition = new Vector2(Screen.width / 2 - (sidebar_width / 2) + 10 , 0.0f);
+
+        bottomBar = Instantiate(baseBar) as GameObject;
+        RectTransform botTrans = bottomBar.GetComponent<RectTransform>();
+        botTrans.SetParent(UICanvas.transform);
+        botTrans.sizeDelta = new Vector2(bottom_width, bottom_height);
+        botTrans.anchoredPosition = new Vector2(0.0f, -(Screen.height / 2) + (bottom_height / 2) - 10);
+
+        towerBuildButton = new GameObject[towerPrefabs.Length];
+
+        towerBuildButton_Width = sidebar_width - sideButton_offset;
+        BuildButtons_X = Screen.width / 2 - (sidebar_width / 2) + 10;
+
+        UpdateButtons();
 	}
 	
 	// Update is called once per frame
@@ -44,14 +90,6 @@ public class Script_GameController : MonoBehaviour {
             waveTimer = wavePause;
         }
       
-        if (Input.GetKey("1")) //if 1 key is pressed and there isn't already a tower being built...
-        {
-            if (!building)
-            {
-                building = true; //sets building to true, creates placement ghost.
-                Instantiate(ghostBaseTower);
-            }
-        }
         if (Input.GetKey("2"))
         {
             DestroyTowers();
@@ -87,6 +125,20 @@ public class Script_GameController : MonoBehaviour {
     }
 
 
+    public void ResetLevel()
+    {
+        DestroyEnemies();
+        DestroyTowers();
+    }
+
+    void DestroyEnemies()
+    {
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Destroy(enemies[i]);
+        }
+    }
+
     void DestroyTowers()
     {
         for (int i = 0; i < ground.Length; i++)
@@ -100,4 +152,44 @@ public class Script_GameController : MonoBehaviour {
         }
     }
 
+    public void BuildTower(GameObject type)
+    {
+        if (!building)
+        {
+                building = true; //sets building to true, creates placement ghost.
+                Instantiate(type);
+        }
+    }
+
+
+    public void UpdateButtons()
+    {
+        for (int i = 0; i < towerPrefabs.Length; i++ )
+        {
+            if (towerBuildButton[i] == null)
+            {
+                RectTransform buttonTrans;
+                towerBuildButton[i] = Instantiate(towerBuildButton_prefab) as GameObject;
+                towerBuildButton[i].transform.SetParent(UICanvas.transform, false);
+                buttonTrans = towerBuildButton[i].GetComponent<RectTransform>();
+                if (buttonTrans != null)
+                {
+                    buttonTrans.sizeDelta = new Vector2(towerBuildButton_Width, towerBuildButton_Height);
+                    buttonTrans.anchoredPosition = new Vector2(BuildButtons_X, BuildButtons_StartY - (i * (towerBuildButton_Height + BuildButtons_Space)));
+                }
+                Script_TowerBuildButton buttonScript = towerBuildButton[i].GetComponent<Script_TowerBuildButton>();
+                if (buttonScript != null)
+                {
+                    buttonScript.UpdateData(towerPrefabs[i].GetComponent<Script_Tower>());
+                    buttonScript.representedTower_Prefab = towerPrefabs[i];
+                }
+                Button button = towerBuildButton[i].GetComponent<Button>();
+                if (button != null)
+                {
+                    GameObject buildPrefab = towerGhostPrefabs[i];
+                    button.onClick.AddListener(() => { BuildTower(buildPrefab); });
+                }
+            }
+        }
+    }
 }
