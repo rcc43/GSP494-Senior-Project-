@@ -23,7 +23,7 @@ public class Script_Base : MonoBehaviour {
         {
             if (controller != null)
             {
-                controller.ResetLevel();
+                //controller.ResetLevel();
             }
         }
 	}

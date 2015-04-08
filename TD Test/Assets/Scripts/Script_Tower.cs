@@ -209,8 +209,11 @@ public class Script_Tower : MonoBehaviour {
 
     void DrawInfocard()
     {
+        Vector3 displayPos = new Vector3(0, 150, 0);
+        /*
         Vector3 displayPos = Camera.main.WorldToScreenPoint(transform.position);
         displayPos.x += infoCard_offsetX;
+         */
         displayPos.y = Screen.height - (displayPos.y - infoCard_offsetY);
         GUI.Box(new Rect(displayPos.x, displayPos.y, infoCard_width, infoCard_height), towerName);
         //displays current damage
