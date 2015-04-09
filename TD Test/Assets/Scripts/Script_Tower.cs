@@ -65,6 +65,7 @@ public class Script_Tower : MonoBehaviour {
         projector.material = new Material(Shader.Find("Particles/Additive"));
         projector.SetColors(Color.green, Color.green);
         projector.SetWidth(.1f, .1f);
+        projector.enabled = false;
 
         audio.clip = fire;
 

@@ -55,7 +55,9 @@
      <Compile Include="Assets\Scripts\Script_GameController.cs" />
      <Compile Include="Assets\Scripts\Script_GhostTower.cs" />
      <Compile Include="Assets\Scripts\Script_Ground.cs" />
+     <Compile Include="Assets\Scripts\Script_HealthBar.cs" />
      <Compile Include="Assets\Scripts\Script_Infocard.cs" />
+     <Compile Include="Assets\Scripts\Script_Infocard_Enemy.cs" />
      <Compile Include="Assets\Scripts\Script_KillAfterTime.cs" />
      <Compile Include="Assets\Scripts\Script_Move.cs" />
      <Compile Include="Assets\Scripts\Script_Road.cs" />

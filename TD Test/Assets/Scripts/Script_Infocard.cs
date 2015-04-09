@@ -28,7 +28,7 @@ public class Script_Infocard : MonoBehaviour {
             text[0].text = representedTowerData.towerName;
             text[1].text = representedTowerData.description;
             text[2].text = "Damage: " + representedTowerData.damage.ToString("F1") + "\nRange: " + representedTowerData.range.ToString("F1")
-                + "\nSpeed: " + representedTowerData.fireRate.ToString("F1") + " shots/s \n\nEffects:\n" + representedTowerData.buff.ParseToString();
+                + "\nSpeed: " + (1 / representedTowerData.fireRate).ToString("F1") + " shots/s \n\nEffects:\n" + representedTowerData.buff.ParseToString();
         }
     }
 }

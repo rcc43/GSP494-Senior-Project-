@@ -3,6 +3,9 @@ using System.Collections;
 
 public class Script_Enemy_Move : MonoBehaviour {
 
+    public string enemyName;
+    public string description;
+
     public GameObject tgt; //the road element currently being targeted.
     public float baseSpeed = 10; //the base speed of this entity.
     public float aboveHeight = .5f; //the height that this entity's center should hover over tiles.
@@ -34,8 +37,9 @@ public class Script_Enemy_Move : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
-
+	void Update ()
+    {
+      
         tgtRoad = tgt.GetComponent<Script_Road>(); //gets the script of the road piece it is targeting.
 
         //finds the distance between it and the center of the target road piece. if it is close...

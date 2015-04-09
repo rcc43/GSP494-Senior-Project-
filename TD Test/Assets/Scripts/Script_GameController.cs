@@ -14,6 +14,8 @@ public class Script_GameController : MonoBehaviour {
     public GameObject SpawnRoad; //the road where the enemy will spawn.
     public Vector3 spawnMove; //this is the direction entities will move upon spawning.
 
+    public GameObject Base; //the player's base.
+
     public bool building = false; //whether or not the cursor is currently placing a tower.
 
     public float wavePause = 3.0f; //time between waves.
@@ -23,12 +25,16 @@ public class Script_GameController : MonoBehaviour {
     List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
     GameObject[] ground;
 
+    GameObject selectedEnemy;
+
     //UI Elements;
 
     public Canvas UICanvas;
     public GameObject baseBar;
     GameObject sidebar;
     GameObject bottomBar;
+    public GameObject healthBar_prefab;
+    GameObject healthBar;
 
     int BuildButtons_X;
     public int BuildButtons_StartY;
@@ -44,6 +50,10 @@ public class Script_GameController : MonoBehaviour {
     public int bottom_height;
 
     public int sideButton_offset;
+
+    public int healthBar_width;
+    public int healthBar_height;
+    public int healthBar_offset;
 
     public GameObject towerBuildButton_prefab;
     GameObject[] towerBuildButton;
@@ -69,6 +79,15 @@ public class Script_GameController : MonoBehaviour {
         botTrans.SetParent(UICanvas.transform);
         botTrans.sizeDelta = new Vector2(bottom_width, bottom_height);
         botTrans.anchoredPosition = new Vector2(0.0f, -(Screen.height / 2) + (bottom_height / 2) - 10);
+
+        healthBar = Instantiate(healthBar_prefab) as GameObject;
+        RectTransform healthTrans = healthBar.GetComponent<RectTransform>();
+        healthTrans.SetParent(UICanvas.transform);
+        healthTrans.sizeDelta = new Vector2(healthBar_width, healthBar_height);
+        healthTrans.anchoredPosition = new Vector2(0 - healthBar_offset, -(Screen.height / 2) + (bottom_height / 2) - 10);
+
+        Script_Base baseData = Base.GetComponent<Script_Base>();
+        baseData.healthBar = healthBar;
 
         towerBuildButton = new GameObject[towerPrefabs.Length];
 

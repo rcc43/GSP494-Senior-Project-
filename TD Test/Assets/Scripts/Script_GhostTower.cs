@@ -79,6 +79,12 @@ public class Script_GhostTower : MonoBehaviour {
             }
         }
 
+        if (Input.GetButton("Fire2"))
+        {
+            Destroy(gameObject);
+            controller.building = false;
+        }
+
         int index = 0;
         for (float i = 0f; index < numPoints; i = i + ((Mathf.PI * 2) / numPoints))
         {
