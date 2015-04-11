@@ -12,6 +12,8 @@ public class Script_Weapon : MonoBehaviour {
     GameObject target; //the target of the weapon.
     float cooldown; //the cooldown timer for the weapon.
 
+    public targetType tgtType;
+
 	// Use this for initialization
 	void Start () {
 
@@ -42,6 +44,7 @@ public class Script_Weapon : MonoBehaviour {
             Script_Shot shot = Instantiate(shotPrefab, transform.position, transform.rotation) as Script_Shot; //creates the shot.
             shot.SetDamage(damage); //sets shot's damage to the weapon's damage.
             shot.SetTarget(target); //sets shot's target to the weapon's target.
+            shot.tgtType = tgtType;
             cooldown = fireRate; //resets the cooldown.
             return true;
         }
@@ -58,6 +61,7 @@ public class Script_Weapon : MonoBehaviour {
             Script_Shot shotData = shot.GetComponent<Script_Shot>();
             shotData.SetDamage(damage);
             shotData.SetTarget(tgt);
+            shotData.tgtType = tgtType;
             cooldown = fireRate;
             if (buff != null)
             {

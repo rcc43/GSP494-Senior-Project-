@@ -44,7 +44,8 @@ public class Script_Base : MonoBehaviour {
     {
         if (other.tag == "Enemy")
         {
-            Destroy(other.gameObject);
+            Script_Enemy_Health tgtHealth = other.GetComponent<Script_Enemy_Health>();
+            tgtHealth.DestroySelf();
             health--;
         }
     }

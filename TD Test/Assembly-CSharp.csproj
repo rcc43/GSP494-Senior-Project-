@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Buff.cs" />
+     <Compile Include="Assets\Scripts\Script_AreaEffect.cs" />
      <Compile Include="Assets\Scripts\Script_Base.cs" />
      <Compile Include="Assets\Scripts\Script_BuffList.cs" />
      <Compile Include="Assets\Scripts\Script_DestroyByContact.cs" />
@@ -56,6 +57,7 @@
      <Compile Include="Assets\Scripts\Script_GhostTower.cs" />
      <Compile Include="Assets\Scripts\Script_Ground.cs" />
      <Compile Include="Assets\Scripts\Script_HealthBar.cs" />
+     <Compile Include="Assets\Scripts\Script_HostileWeapon.cs" />
      <Compile Include="Assets\Scripts\Script_Infocard.cs" />
      <Compile Include="Assets\Scripts\Script_Infocard_Enemy.cs" />
      <Compile Include="Assets\Scripts\Script_KillAfterTime.cs" />

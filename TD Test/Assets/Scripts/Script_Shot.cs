@@ -10,6 +10,8 @@ public class Script_Shot : MonoBehaviour {
 
     GameObject target; //the target this shot will seek.
 
+    public targetType tgtType;
+
 	// Use this for initialization
 	void Start () {
 	

@@ -5,6 +5,8 @@ public class Script_GhostTower : MonoBehaviour {
 
     LineRenderer projector;
 
+    Color projectorColor;
+
     public GameObject spawnedTower; //prefab of the tower that is created by this ghost.
     public float alpha = .5f; //the transparency of the ghost.
     public float height = 1.0f; //the height of the tower (so that the ghost doesn't clip through the ground).
@@ -26,6 +28,13 @@ public class Script_GhostTower : MonoBehaviour {
 
         controller = GameObject.FindWithTag("GameController").GetComponent<Script_GameController>(); //sets up gamecontroller.
 
+        Script_Tower towerStats = spawnedTower.GetComponent<Script_Tower>();
+        if (towerStats != null)
+        {
+            range = towerStats.range;
+            projectorColor = towerStats.ringColor;
+        }
+
         Color color = gameObject.renderer.material.color; //sets alpha to alpha value.
         color.a = alpha;
         gameObject.renderer.material.color = color;
@@ -33,8 +42,9 @@ public class Script_GhostTower : MonoBehaviour {
         projector = gameObject.AddComponent<LineRenderer>();
         projector.SetVertexCount(numPoints + 1);
         projector.material = new Material(Shader.Find("Particles/Additive"));
-        projector.SetColors(Color.green, Color.green);
+        projector.SetColors(projectorColor, projectorColor);
         projector.SetWidth(.1f, .1f);
+
 
 	}
 	

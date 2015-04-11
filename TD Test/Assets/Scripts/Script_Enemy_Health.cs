@@ -125,17 +125,20 @@ public class Script_Enemy_Health : MonoBehaviour {
             Script_Shot shot = other.GetComponent<Script_Shot>(); //acquires shot script.
             if (shot != null)
             {
-                health -= shot.damage; //reduces health by the damage of the shot.
-                if (shot.buff != null && buffs != null)
+                if (shot.tgtType == targetType.enemy)
                 {
-                    buffs.AddBuff(shot.buff); //applies the buff attached to this shot (if any).
+                    health -= shot.damage; //reduces health by the damage of the shot.
+                    if (shot.buff != null && buffs != null)
+                    {
+                        buffs.AddBuff(shot.buff); //applies the buff attached to this shot (if any).
+                    }
+                    Destroy(other.gameObject); //destroys the shot.
                 }
             }
-            Destroy(other.gameObject); //destroys the shot.
         }
     }
 
-    void DestroySelf()
+    public void DestroySelf()
     {
         controller.GetEnemies().Remove(gameObject); //removes itself from the enemy list.
         Destroy(gameObject); //destroys self.

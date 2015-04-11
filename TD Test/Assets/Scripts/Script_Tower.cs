@@ -9,6 +9,9 @@ public class Script_Tower : MonoBehaviour {
 
     public int cost = 300;
 
+    public bool canHitAir = false;
+
+    public Color ringColor;
     LineRenderer projector;
 
     public AudioClip fire;
@@ -21,7 +24,8 @@ public class Script_Tower : MonoBehaviour {
 
     public int numPoints = 10;
 
-    public float damage = 10.0f;
+    public float baseDamage = 10.0f;
+    public float damage;
 
     public float fireRate = 1.0f;
 
@@ -42,11 +46,21 @@ public class Script_Tower : MonoBehaviour {
     public float fireRateUpgradeCurve = .65f;
     public float fireRateCostCurve = 2.0f;
 
+    public int maxDamageLevels = 5;
+    int damageLevel = 0;
+
+    public int maxRangeLevels = 5;
+    int rangeLevel = 0;
+
+    public int maxSpeedLevels = 5;
+    int speedLevel = 0;
+
     bool GUIReserveHit = false; //this keeps a tower selected if a click occurred on its GUI buttons.
     
     Script_Weapon[] weaponTargeting;
     Script_GameController controller;
     List<GameObject> targets = new List<GameObject>();
+    Script_BuffList buffs;
 
 	// Use this for initialization
 	void Start ()
@@ -54,6 +68,10 @@ public class Script_Tower : MonoBehaviour {
         GameController = GameObject.FindWithTag("GameController");
         controller = GameController.GetComponent<Script_GameController>();
         weaponTargeting = new Script_Weapon[weapons.Length];
+
+        buffs = gameObject.GetComponent<Script_BuffList>();
+
+        damage = baseDamage;
         for (int i = 0; i < weapons.Length; i++)
         {
             weaponTargeting[i] = weapons[i].GetComponent<Script_Weapon>();
@@ -63,7 +81,7 @@ public class Script_Tower : MonoBehaviour {
         projector = gameObject.AddComponent<LineRenderer>();
         projector.SetVertexCount(numPoints + 1);
         projector.material = new Material(Shader.Find("Particles/Additive"));
-        projector.SetColors(Color.green, Color.green);
+        projector.SetColors(ringColor, ringColor);
         projector.SetWidth(.1f, .1f);
         projector.enabled = false;
 
@@ -108,6 +126,8 @@ public class Script_Tower : MonoBehaviour {
         }
         else projector.enabled = false;
 
+        UpdateStats();
+
         targets.Clear();
         List<GameObject> potentialTargets = new List<GameObject>();
         for (int i = 0; i < controller.GetEnemies().Count; i++)
@@ -116,9 +136,13 @@ public class Script_Tower : MonoBehaviour {
             if (tgt != null)
             {
                 float dist = Vector3.Distance(transform.position, tgt.transform.position);
-                if (dist < range)
+                Script_Enemy_Move tgtMove = tgt.GetComponent<Script_Enemy_Move>();
+                if (tgtMove != null)
                 {
-                    targets.Add(tgt);
+                    if (dist < range && tgtMove.flying == canHitAir)
+                    {
+                        targets.Add(tgt);
+                    }
                 }
             }
         }
@@ -148,6 +172,34 @@ public class Script_Tower : MonoBehaviour {
             weap.SetDamage(damage);
             weap.fireRate = fireRate;
             weap.buff = buff;
+            weap.tgtType = targetType.enemy;
+        }
+
+        Script_AreaEffect area = GetComponent<Script_AreaEffect>();
+        if (area)
+        {
+            buff.magnitude = baseDamage;
+            area.buff = buff;
+            area.range = range;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Shot") //checks if the things colliding with it is a shot.
+        {
+            Script_Shot shot = other.GetComponent<Script_Shot>(); //acquires shot script.
+            if (shot != null)
+            {
+                if (shot.tgtType == targetType.tower)
+                {
+                    if (shot.buff != null && buffs != null)
+                    {
+                        buffs.AddBuff(shot.buff); //applies the buff attached to this shot (if any).
+                    }
+                    Destroy(other.gameObject); //destroys the shot.
+                }
+            }
         }
     }
 
@@ -182,34 +234,37 @@ public class Script_Tower : MonoBehaviour {
             }
         }
 
-        for (int i = 0; i < weapons.Length; i++)
+        if (!stunned)
         {
-            if (tgt[i] != null)
+            for (int i = 0; i < weapons.Length; i++)
             {
-                weapons[i].transform.LookAt(tgt[i].transform);
-                if (buff != null)
+                if (tgt[i] != null)
                 {
-                    if (weaponTargeting[i].Fire(tgt[i]))
+                    weapons[i].transform.LookAt(tgt[i].transform);
+                    if (buff != null)
                     {
-                        //audio.Play();
+                        if (weaponTargeting[i].Fire(tgt[i]))
+                        {
+                            //audio.Play();
+                        }
                     }
-                }
-                else
-                {
-                    if (weaponTargeting[i].Fire(tgt[i]))
+                    else
                     {
-                      //  audio.Play();
+                        if (weaponTargeting[i].Fire(tgt[i]))
+                        {
+                            //  audio.Play();
+                        }
                     }
                 }
             }
         }
-
     }
 
 
 
     void DrawInfocard()
     {
+        GUI.skin = controller.basicSkin;
         Vector3 displayPos = new Vector3(0, 150, 0);
         /*
         Vector3 displayPos = Camera.main.WorldToScreenPoint(transform.position);
@@ -219,44 +274,67 @@ public class Script_Tower : MonoBehaviour {
         GUI.Box(new Rect(displayPos.x, displayPos.y, infoCard_width, infoCard_height), towerName);
         //displays current damage
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Damage: ");
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), damage.ToString("F1"));
-        //displays range if damage         
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), (damage * damageUpgradeCurve).ToString("F1"));
-        //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
+        if (damage > baseDamage)
         {
-            damage = damage * damageUpgradeCurve;
-            GUIReserveHit = true;
-            UpdateStats();
+            GUI.skin = controller.buffedSkin; //if the damage is being buffed, changes text color
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .13f) + 15), infoCard_width * .5f, infoCard_height * .5f), damage.ToString("F1"));
+            GUI.skin = controller.basicSkin;
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .21f) + 15), infoCard_width * .5f, infoCard_height * .5f), baseDamage.ToString("F1"));
+        }
+        else
+        {
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), damage.ToString("F1"));
+        }
+        //button for upgrading
+        if (damageLevel < maxDamageLevels)
+        {
+            //displays damage if upgraded         
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), (baseDamage * damageUpgradeCurve).ToString("F1"));
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            {
+                baseDamage = baseDamage * damageUpgradeCurve;
+                damage = damage * damageUpgradeCurve;
+                damageLevel++;
+                GUIReserveHit = true;
+                UpdateStats();
+            }
         }
 
         //displays current Range
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .4f)), infoCard_width * .5f, infoCard_height * .5f), "Range: ");
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .5f, infoCard_height * .5f), range.ToString("F1"));
-        //displays speed if upgraded        
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .5f, infoCard_height * .5f), (range * rangeUpgradeCurve).ToString("F1"));
         //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
+        if (rangeLevel < maxRangeLevels)
         {
-            range = range * rangeUpgradeCurve;
-            GUIReserveHit = true;
-            UpdateStats();
+            //displays range if upgraded        
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .5f, infoCard_height * .5f), (range * rangeUpgradeCurve).ToString("F1"));
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            {
+                range = range * rangeUpgradeCurve;
+                rangeLevel++;
+                GUIReserveHit = true;
+                UpdateStats();
+            }
         }
 
         //displays current speed
         GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .65f)), infoCard_width * .5f, infoCard_height * .5f), "Speed: ");
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), fireRate.ToString("F1"));
-        //displays speed if upgraded         
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
-        GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), (fireRate * fireRateUpgradeCurve).ToString("F1"));
+        GUI.Label(new Rect(displayPos.x + (infoCard_width * .02f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), (1 / fireRate).ToString("F1"));
         //button for upgrading
-        if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .1f), "Cost: " + (cost).ToString("F1")))
+        if (speedLevel < maxSpeedLevels)
         {
-            fireRate = fireRate * fireRateUpgradeCurve;
-            GUIReserveHit = true;
-            UpdateStats();
+            //displays speed if upgraded         
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
+            GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), (1 / (fireRate * fireRateUpgradeCurve)).ToString("F1"));
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            {
+                fireRate = fireRate * fireRateUpgradeCurve;
+                speedLevel++;
+                GUIReserveHit = true;
+                UpdateStats();
+            }
         }
     }
 }

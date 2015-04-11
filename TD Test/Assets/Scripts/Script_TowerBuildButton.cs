@@ -56,7 +56,6 @@ public class Script_TowerBuildButton : MonoBehaviour {
             Script_Infocard data = infoCard.GetComponent<Script_Infocard>();
             if (data != null)
             {
-                Debug.Log("Double Meep!");
                 data.representedTower_Prefab = representedTower_Prefab;
                 data.UpdateData();
             }

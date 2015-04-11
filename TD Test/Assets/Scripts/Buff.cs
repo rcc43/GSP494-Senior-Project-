@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-public enum buffType : int { doNothing, EnemyReduceSpeedPercent, EnemyStun, TowerStun, DealDOT};
+public enum buffType : int { doNothing, EnemyReduceSpeedPercent, EnemyStun, TowerStun, DealDOT, TowerUpDamagePercent};
 
 [Serializable]
 public class Buff
@@ -92,12 +92,42 @@ public class Buff
                     break;
                 case buffType.TowerStun:
                     {
-                        if (enemyMove != null)
+                        if (towerStats != null)
                         {
                             towerStats.stunned = true; //stun the tower.
                         }
+                        break;
                     }
-                    break;
+                case buffType.DealDOT:
+                    {
+                        if (enemyStats != null)
+                        {
+                            if (magnitude < 0)
+                            {
+                                if (enemyStats.health - magnitude < enemyStats.maxHealth)
+                                {
+                                    enemyStats.health -= magnitude;
+                                }
+                                else
+                                {
+                                    enemyStats.health = enemyStats.maxHealth;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            enemyStats.health -= magnitude;
+                        }
+                        break;
+                    }
+                case buffType.TowerUpDamagePercent:
+                    {
+                        if (towerStats != null)
+                        {
+                            towerStats.damage *= 1 + (magnitude / 100);
+                        }
+                        break;
+                    }
             }
         }
     }
@@ -140,6 +170,14 @@ public class Buff
                     }
                 }
                 break;
+            case buffType.TowerUpDamagePercent:
+                {
+                    if (towerStats != null)
+                    {
+                        towerStats.damage *= (100 / (100 + magnitude) );
+                    }
+                    break;
+                }
 
         }
     }
@@ -182,6 +220,23 @@ public class Buff
             case (buffType.EnemyReduceSpeedPercent):
                 {
                     answer = "Slow: " + magnitude.ToString() + "%, " + duration.ToString("F1") + "s";
+                    break;
+                }
+            case (buffType.TowerUpDamagePercent):
+                {
+                    answer = "Boost Damage: " + magnitude.ToString("F1") + "%, " + duration.ToString("F1") + "s";
+                    break;
+                }
+            case (buffType.DealDOT):
+                {
+                    if (magnitude < 0)
+                    {
+                        answer = "Heal: " + Mathf.Abs(magnitude).ToString("F1") + " hp/s, " + duration.ToString("F1") + "s";
+                    }
+                    else if (magnitude > 0)
+                    {
+                        answer = "DOT: " + magnitude.ToString("F1") + " hp/s, " + duration.ToString("F1") + "s";
+                    }
                     break;
                 }
         }
