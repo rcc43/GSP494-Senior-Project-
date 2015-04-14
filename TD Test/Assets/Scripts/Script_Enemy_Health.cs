@@ -138,14 +138,21 @@ public class Script_Enemy_Health : MonoBehaviour {
         }
     }
 
+    public void SetHealth(float newHealth)
+    {
+        maxHealth = newHealth;
+        health = maxHealth;
+    }
+
     public void DestroySelf()
     {
         controller.GetEnemies().Remove(gameObject); //removes itself from the enemy list.
-        Destroy(gameObject); //destroys self.
+
         if (drawingCard)
         {
             Destroy(infocard);
         }
 
+        Destroy(gameObject); //destroys self.
     }
 }

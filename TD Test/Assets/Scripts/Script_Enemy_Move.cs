@@ -18,6 +18,7 @@ public class Script_Enemy_Move : MonoBehaviour {
     public float speed; //the movement speed of the entity, with debuffs/buffs factored in.
 
     Script_Road tgtRoad; //the script of a target road piece.
+    public Formation formation;
 
 	// Use this for initialization
 	void Start ()
@@ -55,11 +56,49 @@ public class Script_Enemy_Move : MonoBehaviour {
             //finds the distance between it and the center of the target road piece. if it is close...
             if (Vector3.Distance((tgt.transform.position + new Vector3(0.0f, aboveHeight, 0.0f)), transform.position) < tgtRoad.turnProximity)
             {
-                int rand = Random.Range(0, tgtRoad.numBranches);
-                if (tgtRoad.next[rand] != null) //checks if the target road points to a new road piece.
+                if (tgtRoad.numBranches > 1)
                 {
-                    tgt = tgtRoad.next[rand]; //if so, sets that piece as the new target, gets its script.
-                    tgtRoad = tgt.GetComponent<Script_Road>();
+                    if (formation != null)
+                    {
+                        if (formation.IsFirst(gameObject))
+                        {
+                            int rand = Random.Range(0, tgtRoad.numBranches);
+                            formation.AddChoice(rand);
+                            formation.positionUp(gameObject);
+                            if (tgtRoad.next[rand] != null) //checks if the target road points to a new road piece.
+                            {
+                                tgt = tgtRoad.next[rand]; //if so, sets that piece as the new target, gets its script.
+                                tgtRoad = tgt.GetComponent<Script_Road>();
+                            }
+                        }
+                        else
+                        {
+                            int branchChoice = formation.GetChoice(gameObject);
+                            formation.positionUp(gameObject);
+                            if (tgtRoad.next[branchChoice] != null) //checks if the target road points to a new road piece.
+                            {
+                                tgt = tgtRoad.next[branchChoice]; //if so, sets that piece as the new target, gets its script.
+                                tgtRoad = tgt.GetComponent<Script_Road>();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        int rand = Random.Range(0, tgtRoad.numBranches);
+                        if (tgtRoad.next[rand] != null) //checks if the target road points to a new road piece.
+                        {
+                            tgt = tgtRoad.next[rand]; //if so, sets that piece as the new target, gets its script.
+                            tgtRoad = tgt.GetComponent<Script_Road>();
+                        }
+                    }
+                }
+                else
+                {
+                    if (tgtRoad.next[0] != null) //checks if the target road points to a new road piece.
+                    {
+                        tgt = tgtRoad.next[0]; //if so, sets that piece as the new target, gets its script.
+                        tgtRoad = tgt.GetComponent<Script_Road>();
+                    }
                 }
             }
 
