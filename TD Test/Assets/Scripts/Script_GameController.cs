@@ -19,9 +19,16 @@ public class Script_GameController : MonoBehaviour {
     public GameObject Base; //the player's base.
 
     public bool building = false; //whether or not the cursor is currently placing a tower.
+    public float Resources;
+
+    bool insufficentResources;
+    public float resourcesFlashTime;
+    float resourcesFlashCounter = 0;
 
     int waveNum;
     public int startWaveSize;
+
+    float timeToWave = 0.0f;
 
     public float inFormationPause = .5f;
     public float betweenFormationPause = 1.0f;
@@ -35,6 +42,7 @@ public class Script_GameController : MonoBehaviour {
 
     public GUISkin basicSkin;
     public GUISkin buffedSkin;
+    public GUISkin debuffSkin;
 
     GameObject selectedEnemy;
 
@@ -95,11 +103,13 @@ public class Script_GameController : MonoBehaviour {
         healthBar = Instantiate(healthBar_prefab) as GameObject;
         RectTransform healthTrans = healthBar.GetComponent<RectTransform>();
         healthTrans.SetParent(UICanvas.transform);
-        healthTrans.sizeDelta = new Vector2(healthBar_width, healthBar_height);
+        //healthTrans.sizeDelta = new Vector2(healthBar_width, healthBar_height);
         healthTrans.anchoredPosition = new Vector2(0 - healthBar_offset, -(Screen.height / 2) + (bottom_height / 2) - 10);
+        Script_HealthBar healthBarData = healthBar.GetComponent<Script_HealthBar>();
 
         Script_Base baseData = Base.GetComponent<Script_Base>();
         baseData.healthBar = healthBar;
+        baseData.healthProjection = healthBar.GetComponent<Script_HealthBar>();
 
         towerBuildButton = new GameObject[towerPrefabs.Length];
 
@@ -112,34 +122,41 @@ public class Script_GameController : MonoBehaviour {
 
         FormationLedger.Init();
 
-        spawnQueue.Add(FormationLedger.formationBlueprints[0]);
-        spawnQueue.Add(FormationLedger.formationBlueprints[1]);
-
         StartCoroutine(StartGame());
 	}
 	
 	// Update is called once per frame
 	void Update ()
     {
-        /*
-        if (waveTimer[1] <= 0)
+        timeToWave -= Time.deltaTime;
+        if (resourcesFlashCounter >= 0)
         {
-            SpawnChiron();
-            waveTimer[1] = wavePause[1];
+            resourcesFlashCounter -= Time.deltaTime;
         }
-
-        if (waveTimer[2] <= 0)
+        else
         {
-            SpawnHercules();
-            waveTimer[2] = wavePause[2];
+            insufficentResources = false;
         }
-        */
       
         if (Input.GetKey("2"))
         {
             DestroyTowers();
         }
 	}
+
+    void OnGUI()
+    {
+        GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+        if (insufficentResources == true)
+        {
+            GUI.skin = debuffSkin;
+        }
+        else
+        {
+            GUI.skin = basicSkin;
+        }
+        GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
+    }
 
 
     //returns a list of enemies.
@@ -335,6 +352,7 @@ public class Script_GameController : MonoBehaviour {
             float healthFactor = waveNum * .1f + 1.0f;
             Script_Enemy_Health memHealth = formation.members[i].GetComponent<Script_Enemy_Health>();
             memHealth.SetHealth(memHealth.maxHealth * healthFactor);
+            memHealth.resourceYield *= healthFactor;
             Script_AreaEffect area = formation.members[i].GetComponent<Script_AreaEffect>();
             if (area != null)
             {
@@ -361,12 +379,14 @@ public class Script_GameController : MonoBehaviour {
 
     IEnumerator StartGame()
     {
-        yield return new WaitForSeconds(1.0f);
+        timeToWave = betweenWavePause;
+        yield return new WaitForSeconds(betweenWavePause);
         while (true)
         {
             Debug.Log("Starting Wave " + (waveNum + 1).ToString());
             StartCoroutine(SpawnWave());
             float waveLength = CalculateWaveLength();
+            timeToWave = waveLength;
             yield return new WaitForSeconds(waveLength);
         }
     }
@@ -374,14 +394,26 @@ public class Script_GameController : MonoBehaviour {
     float CalculateWaveLength()
     {
         float length = 0;
-        Debug.Log(spawnQueue.Count);
         for (int i = 0; i < spawnQueue.Count; i++)
         {
-            Debug.Log(spawnQueue[i].spawnList.Count);
-            length += (spawnQueue[i].spawnList.Count * inFormationPause) + betweenFormationPause * 2;
+            length += (spawnQueue[i].spawnList.Count * inFormationPause) + betweenFormationPause * 1.5f;
         }
         length += betweenWavePause;
-        Debug.Log(length);
         return length;
+    }
+
+    public bool EnoughResources(float cost)
+    {
+        if (Resources - cost >= 0)
+        {
+            Resources -= cost;
+            return true;
+        }
+        else
+        {
+            insufficentResources = true;
+            resourcesFlashCounter = resourcesFlashTime;
+            return false;
+        }
     }
 }

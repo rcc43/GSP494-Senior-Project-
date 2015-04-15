@@ -6,12 +6,12 @@ public class Script_HealthBar : MonoBehaviour {
     public float maxHealth;
     public float health;
 
-    Transform healthLeft;
+    RectTransform healthLeft;
 
 	// Use this for initialization
 	void Start ()
     {
-        healthLeft = transform.FindChild("Health");
+        healthLeft = transform.FindChild("Health").gameObject.GetComponent<RectTransform>();
         ResizeBar();
 	}
 	
@@ -28,6 +28,7 @@ public class Script_HealthBar : MonoBehaviour {
 
     public void ResizeBar()
     {
+        healthLeft = transform.FindChild("Health").gameObject.GetComponent<RectTransform>();
         RectTransform trans = gameObject.GetComponent<RectTransform>(); //gathers the transform of the health background.
         RectTransform healthChild = transform.FindChild("Health/HealthLeft").GetComponent<RectTransform>(); //resizes health-left bar to match background.
         healthChild.sizeDelta = trans.sizeDelta;

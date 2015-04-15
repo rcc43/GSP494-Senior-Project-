@@ -14,7 +14,7 @@ public class Script_Shot : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+
 	}
 	
 	// Update is called once per frame

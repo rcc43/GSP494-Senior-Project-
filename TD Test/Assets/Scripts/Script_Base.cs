@@ -10,7 +10,7 @@ public class Script_Base : MonoBehaviour {
 
     GameObject gameController;
     Script_GameController controller;
-    Script_HealthBar healthProjection;
+    public Script_HealthBar healthProjection;
 
 	// Use this for initialization
 	void Start () {
@@ -18,8 +18,6 @@ public class Script_Base : MonoBehaviour {
         gameController = GameObject.FindWithTag("GameController");
         controller = gameController.GetComponent<Script_GameController>();
 
-        healthProjection = healthBar.GetComponent<Script_HealthBar>();
-	
 	}
 	
 	// Update is called once per frame

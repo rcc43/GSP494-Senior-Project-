@@ -37,12 +37,15 @@ public class Script_Tower : MonoBehaviour {
     public int infoCard_offsetX = 20;
     public int infoCard_offsetY = 20;
 
+    public float damageCost = 50.0f;
     public float damageUpgradeCurve = 1.65f;
     public float damageCostCurve = 2.0f;
 
+    public float rangeCost = 50.0f;
     public float rangeUpgradeCurve = 1.15f;
     public float rangeCostCurve = 2.0f;
 
+    public float fireRateCost = 50.0f;
     public float fireRateUpgradeCurve = .65f;
     public float fireRateCostCurve = 2.0f;
 
@@ -245,14 +248,14 @@ public class Script_Tower : MonoBehaviour {
                     {
                         if (weaponTargeting[i].Fire(tgt[i]))
                         {
-                            //audio.Play();
+                            audio.Play();
                         }
                     }
                     else
                     {
                         if (weaponTargeting[i].Fire(tgt[i]))
                         {
-                            //  audio.Play();
+                              audio.Play();
                         }
                     }
                 }
@@ -291,13 +294,17 @@ public class Script_Tower : MonoBehaviour {
             //displays damage if upgraded         
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .5f, infoCard_height * .5f), (baseDamage * damageUpgradeCurve).ToString("F1"));
-            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .15f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (damageCost).ToString("F1")))
             {
-                baseDamage = baseDamage * damageUpgradeCurve;
-                damage = damage * damageUpgradeCurve;
-                damageLevel++;
-                GUIReserveHit = true;
-                UpdateStats();
+                if (controller.EnoughResources(damageCost))
+                {
+                    baseDamage = baseDamage * damageUpgradeCurve;
+                    damage = damage * damageUpgradeCurve;
+                    damageCost *= damageCostCurve;
+                    damageLevel++;
+                    GUIReserveHit = true;
+                    UpdateStats();
+                }
             }
         }
 
@@ -310,12 +317,16 @@ public class Script_Tower : MonoBehaviour {
             //displays range if upgraded        
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .5f, infoCard_height * .5f), (range * rangeUpgradeCurve).ToString("F1"));
-            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .4f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (rangeCost).ToString("F1")))
             {
-                range = range * rangeUpgradeCurve;
-                rangeLevel++;
-                GUIReserveHit = true;
-                UpdateStats();
+                if (controller.EnoughResources(rangeCost))
+                {
+                    range = range * rangeUpgradeCurve;
+                    rangeCost *= rangeCostCurve;
+                    rangeLevel++;
+                    GUIReserveHit = true;
+                    UpdateStats();
+                }
             }
         }
 
@@ -328,12 +339,16 @@ public class Script_Tower : MonoBehaviour {
             //displays speed if upgraded         
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f)), infoCard_width * .5f, infoCard_height * .5f), "Upgrade:");
             GUI.Label(new Rect(displayPos.x + (infoCard_width * .25f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .5f, infoCard_height * .5f), (1 / (fireRate * fireRateUpgradeCurve)).ToString("F1"));
-            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (cost).ToString("F1")))
+            if (GUI.Button(new Rect(displayPos.x + (infoCard_width * .55f), (displayPos.y + (infoCard_height * .65f) + 15), infoCard_width * .4f, infoCard_height * .2f), "Cost: " + (fireRateCost).ToString("F1")))
             {
-                fireRate = fireRate * fireRateUpgradeCurve;
-                speedLevel++;
-                GUIReserveHit = true;
-                UpdateStats();
+                if (controller.EnoughResources(fireRateCost))
+                {
+                    fireRate = fireRate * fireRateUpgradeCurve;
+                    fireRateCost *= fireRateCostCurve;
+                    speedLevel++;
+                    GUIReserveHit = true;
+                    UpdateStats();
+                }
             }
         }
     }

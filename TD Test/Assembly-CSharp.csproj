@@ -52,6 +52,7 @@
      <Compile Include="Assets\Scripts\Script_AreaEffect.cs" />
      <Compile Include="Assets\Scripts\Script_Base.cs" />
      <Compile Include="Assets\Scripts\Script_BuffList.cs" />
+     <Compile Include="Assets\Scripts\Script_Colorize.cs" />
      <Compile Include="Assets\Scripts\Script_DestroyByContact.cs" />
      <Compile Include="Assets\Scripts\Script_Enemy_Health.cs" />
      <Compile Include="Assets\Scripts\Script_Enemy_Move.cs" />

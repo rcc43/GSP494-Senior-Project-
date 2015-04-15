@@ -13,6 +13,8 @@ public class Script_GhostTower : MonoBehaviour {
 
     public float range = 15;
 
+    public float cost;
+
     public int numPoints = 50;
 
     bool foundLocation; //varaible denoting when the ghost is over a viable build location.
@@ -33,6 +35,7 @@ public class Script_GhostTower : MonoBehaviour {
         {
             range = towerStats.range;
             projectorColor = towerStats.ringColor;
+            cost = towerStats.cost;
         }
 
         Color color = gameObject.renderer.material.color; //sets alpha to alpha value.
@@ -80,11 +83,14 @@ public class Script_GhostTower : MonoBehaviour {
             {
                 if (groundTarget.tower == null)
                 {
-                    GameObject newTower = Instantiate(spawnedTower, transform.position, transform.rotation) as GameObject; //if not, builds a tower at this location.
-                    groundTarget.tower = newTower;
-                    Destroy(gameObject);
-                    controller.building = false;
-                    controller.GetTowers().Add(newTower);
+                    if (controller.EnoughResources(cost))
+                    {
+                        GameObject newTower = Instantiate(spawnedTower, transform.position, transform.rotation) as GameObject; //if not, builds a tower at this location.
+                        groundTarget.tower = newTower;
+                        Destroy(gameObject);
+                        controller.building = false;
+                        controller.GetTowers().Add(newTower);
+                    }
                 }
             }
         }

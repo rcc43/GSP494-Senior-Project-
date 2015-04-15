@@ -10,6 +10,8 @@ public class Script_Enemy_Health : MonoBehaviour {
     public float maxHealth = 20;
     public float health; //health value.
 
+    public float resourceYield;
+
     Script_GameController controller; //the gamecontroller script.
     Script_BuffList buffs; //the buffs applied to this entity.
 
@@ -39,6 +41,20 @@ public class Script_Enemy_Health : MonoBehaviour {
         buffs = gameObject.GetComponent<Script_BuffList>(); //sets up the buff list.
 
         health = maxHealth;
+
+        Script_AreaEffect area = gameObject.GetComponent<Script_AreaEffect>();
+
+        if (area != null)
+        {
+            projectorRange = area.range;
+        }
+
+        Script_HostileWeapon weap = gameObject.GetComponent<Script_HostileWeapon>();
+
+        if (weap != null)
+        {
+            projectorRange = weap.range;
+        }
 
         projector = gameObject.AddComponent<LineRenderer>();
         projector.SetVertexCount(numPoints + 1);
@@ -147,6 +163,7 @@ public class Script_Enemy_Health : MonoBehaviour {
     public void DestroySelf()
     {
         controller.GetEnemies().Remove(gameObject); //removes itself from the enemy list.
+        controller.Resources += resourceYield;
 
         if (drawingCard)
         {
