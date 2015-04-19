@@ -6,6 +6,9 @@ public class Script_Base : MonoBehaviour {
     public float maxHealth = 100;
     public float health = 100;
 
+    public bool invincible = false;
+
+
     public GameObject healthBar;
 
     GameObject gameController;
@@ -33,7 +36,11 @@ public class Script_Base : MonoBehaviour {
         {
             if (controller != null)
             {
-                //controller.ResetLevel();
+                if (!controller.defeated)
+                {
+                    controller.defeated = true;
+                    controller.defeatTimer = 5.0f;
+                }
             }
         }
 	}
@@ -43,8 +50,11 @@ public class Script_Base : MonoBehaviour {
         if (other.tag == "Enemy")
         {
             Script_Enemy_Health tgtHealth = other.GetComponent<Script_Enemy_Health>();
-            tgtHealth.DestroySelf();
-            health--;
+            tgtHealth.DestroySelf(false);
+            if (!invincible)
+            {
+                health--;
+            }
         }
     }
 }

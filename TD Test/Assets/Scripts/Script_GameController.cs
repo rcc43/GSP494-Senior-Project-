@@ -7,6 +7,8 @@ using System.Collections;
 //drives the game
 public class Script_GameController : MonoBehaviour {
 
+    public bool demo = false;
+
     public GameObject[] enemyRoster;
 
     public GameObject[] towerGhostPrefabs; //the prefab for the test tower placement ghost.
@@ -16,9 +18,12 @@ public class Script_GameController : MonoBehaviour {
     public GameObject[] flyerSpawns; //locations that flying units will spawn.
     public Vector3 spawnMove; //this is the direction entities will move upon spawning.
 
+    public GameObject PauseMenu;
+
     public GameObject Base; //the player's base.
 
     public bool building = false; //whether or not the cursor is currently placing a tower.
+    public bool paused = false;
     public float Resources;
 
     bool insufficentResources;
@@ -30,9 +35,13 @@ public class Script_GameController : MonoBehaviour {
 
     float timeToWave = 0.0f;
 
+    public float startGamePause = 20.0f;
     public float inFormationPause = .5f;
     public float betweenFormationPause = 1.0f;
     public float betweenWavePause = 10.0f;
+
+    public float defeatTimer = 0.0f;
+    public bool defeated = false;
 
     public List<FormationBlueprint> spawnQueue = new List<FormationBlueprint>();
 
@@ -45,6 +54,8 @@ public class Script_GameController : MonoBehaviour {
     public GUISkin debuffSkin;
 
     GameObject selectedEnemy;
+
+    public string mainMenuLevel;
 
     //UI Elements;
 
@@ -88,35 +99,38 @@ public class Script_GameController : MonoBehaviour {
             spawnRoadTile.FindNext(spawnMove);
         }
 
-        sidebar = Instantiate(baseBar) as GameObject;
-        RectTransform sideTrans = sidebar.GetComponent<RectTransform>();
-        sideTrans.SetParent(UICanvas.transform);
-        sideTrans.sizeDelta = new Vector2(sidebar_width, sidebar_height);
-        sideTrans.anchoredPosition = new Vector2(Screen.width / 2 - (sidebar_width / 2) + 10 , 0.0f);
+        if (!demo)
+        {
+            sidebar = Instantiate(baseBar) as GameObject;
+            RectTransform sideTrans = sidebar.GetComponent<RectTransform>();
+            sideTrans.SetParent(UICanvas.transform);
+            sideTrans.sizeDelta = new Vector2(sidebar_width, sidebar_height);
+            sideTrans.anchoredPosition = new Vector2(Screen.width / 2 - (sidebar_width / 2) + 10, 0.0f);
 
-        bottomBar = Instantiate(baseBar) as GameObject;
-        RectTransform botTrans = bottomBar.GetComponent<RectTransform>();
-        botTrans.SetParent(UICanvas.transform);
-        botTrans.sizeDelta = new Vector2(bottom_width, bottom_height);
-        botTrans.anchoredPosition = new Vector2(0.0f, -(Screen.height / 2) + (bottom_height / 2) - 10);
+            bottomBar = Instantiate(baseBar) as GameObject;
+            RectTransform botTrans = bottomBar.GetComponent<RectTransform>();
+            botTrans.SetParent(UICanvas.transform);
+            botTrans.sizeDelta = new Vector2(bottom_width, bottom_height);
+            botTrans.anchoredPosition = new Vector2(0.0f, -(Screen.height / 2) + (bottom_height / 2) - 10);
 
-        healthBar = Instantiate(healthBar_prefab) as GameObject;
-        RectTransform healthTrans = healthBar.GetComponent<RectTransform>();
-        healthTrans.SetParent(UICanvas.transform);
-        //healthTrans.sizeDelta = new Vector2(healthBar_width, healthBar_height);
-        healthTrans.anchoredPosition = new Vector2(0 - healthBar_offset, -(Screen.height / 2) + (bottom_height / 2) - 10);
-        Script_HealthBar healthBarData = healthBar.GetComponent<Script_HealthBar>();
+            healthBar = Instantiate(healthBar_prefab) as GameObject;
+            RectTransform healthTrans = healthBar.GetComponent<RectTransform>();
+            healthTrans.SetParent(UICanvas.transform);
+            //healthTrans.sizeDelta = new Vector2(healthBar_width, healthBar_height);
+            healthTrans.anchoredPosition = new Vector2(0 - healthBar_offset, -(Screen.height / 2) + (bottom_height / 2) - 10);
+            Script_HealthBar healthBarData = healthBar.GetComponent<Script_HealthBar>();
 
-        Script_Base baseData = Base.GetComponent<Script_Base>();
-        baseData.healthBar = healthBar;
-        baseData.healthProjection = healthBar.GetComponent<Script_HealthBar>();
+            Script_Base baseData = Base.GetComponent<Script_Base>();
+            baseData.healthBar = healthBar;
+            baseData.healthProjection = healthBar.GetComponent<Script_HealthBar>();
 
-        towerBuildButton = new GameObject[towerPrefabs.Length];
+            towerBuildButton = new GameObject[towerPrefabs.Length];
 
-        towerBuildButton_Width = sidebar_width - sideButton_offset;
-        BuildButtons_X = Screen.width / 2 - (sidebar_width / 2) + 10;
+            towerBuildButton_Width = sidebar_width - sideButton_offset;
+            BuildButtons_X = Screen.width / 2 - (sidebar_width / 2) + 10;
 
-        UpdateButtons();
+            UpdateButtons();
+        }
 
         waveNum = 0;
 
@@ -137,25 +151,46 @@ public class Script_GameController : MonoBehaviour {
         {
             insufficentResources = false;
         }
-      
-        if (Input.GetKey("2"))
+
+        if (defeated)
         {
-            DestroyTowers();
+            defeatTimer -= Time.deltaTime;
+            if (defeatTimer <= 0)
+            {
+                defeated = false;
+                ResetLevel();
+            }
+        }
+
+        if (!demo)
+        {
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                Pause();
+            }
         }
 	}
 
     void OnGUI()
     {
-        GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
-        if (insufficentResources == true)
+        if (!demo)
         {
-            GUI.skin = debuffSkin;
+            GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+            if (insufficentResources == true)
+            {
+                GUI.skin = debuffSkin;
+            }
+            else
+            {
+                GUI.skin = basicSkin;
+            }
+            GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
+
+            if (defeated)
+            {
+                GUI.Label(new Rect(350f, 300.0f, 80.0f, 70.0f), "Base Destroyed.");
+            }
         }
-        else
-        {
-            GUI.skin = basicSkin;
-        }
-        GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
     }
 
 
@@ -244,7 +279,34 @@ public class Script_GameController : MonoBehaviour {
     {
         DestroyEnemies();
         DestroyTowers();
+        waveNum = 0;
+        Base.GetComponent<Script_Base>().health = 100;
+        Resources = 2000;
+        StopAllCoroutines();
+        StartCoroutine(StartGame());
     }
+
+    public void Pause()
+    {
+        paused = true;
+        Time.timeScale = 0.0f;
+        PauseMenu.SetActive(true);
+    }
+
+    public void Unpause()
+    {
+        paused = false;
+        Time.timeScale = 1.0f;
+        PauseMenu.SetActive(false);
+    }
+
+    public void Quit()
+    {
+        ResetLevel();
+        Application.LoadLevel(mainMenuLevel);
+
+    }
+
 
     void DestroyEnemies()
     {
@@ -252,6 +314,7 @@ public class Script_GameController : MonoBehaviour {
         {
             Destroy(enemies[i]);
         }
+        enemies.Clear();
     }
 
     void DestroyTowers()
@@ -265,6 +328,7 @@ public class Script_GameController : MonoBehaviour {
                 groundScript.tower = null;
             }
         }
+        towers.Clear();
     }
 
     public void BuildTower(GameObject type)
@@ -379,8 +443,8 @@ public class Script_GameController : MonoBehaviour {
 
     IEnumerator StartGame()
     {
-        timeToWave = betweenWavePause;
-        yield return new WaitForSeconds(betweenWavePause);
+        timeToWave = startGamePause;
+        yield return new WaitForSeconds(startGamePause);
         while (true)
         {
             Debug.Log("Starting Wave " + (waveNum + 1).ToString());

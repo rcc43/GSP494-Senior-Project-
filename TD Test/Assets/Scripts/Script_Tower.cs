@@ -15,6 +15,9 @@ public class Script_Tower : MonoBehaviour {
     LineRenderer projector;
 
     public AudioClip fire;
+    public bool soundless = false;
+
+    public bool demo = false;
 
     public Buff buff;
 
@@ -113,23 +116,26 @@ public class Script_Tower : MonoBehaviour {
             }
         }
 
-        if (Input.GetButtonUp("Fire1"))
+        if (!demo)
         {
-            if (selectHit || GUIReserveHit)
+            if (Input.GetButtonUp("Fire1"))
             {
-                selected = true;
-                GUIReserveHit = false;
+                if (selectHit || GUIReserveHit)
+                {
+                    selected = true;
+                    GUIReserveHit = false;
+                }
+                else selected = false;
             }
-            else selected = false;
-        }
 
-        if (selected)
-        {
-            projector.enabled = true;
-        }
-        else projector.enabled = false;
+            if (selected)
+            {
+                projector.enabled = true;
+            }
+            else projector.enabled = false;
 
-        UpdateStats();
+            UpdateStats();
+        }
 
         targets.Clear();
         List<GameObject> potentialTargets = new List<GameObject>();
@@ -248,14 +254,20 @@ public class Script_Tower : MonoBehaviour {
                     {
                         if (weaponTargeting[i].Fire(tgt[i]))
                         {
-                            audio.Play();
+                            if (!soundless)
+                            {
+                                audio.Play();
+                            }
                         }
                     }
                     else
                     {
                         if (weaponTargeting[i].Fire(tgt[i]))
                         {
-                              audio.Play();
+                            if (!soundless)
+                            {
+                                audio.Play();
+                            }
                         }
                     }
                 }

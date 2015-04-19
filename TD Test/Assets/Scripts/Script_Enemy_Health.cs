@@ -10,6 +10,8 @@ public class Script_Enemy_Health : MonoBehaviour {
     public float maxHealth = 20;
     public float health; //health value.
 
+    public bool demo = false;
+
     public float resourceYield;
 
     Script_GameController controller; //the gamecontroller script.
@@ -69,67 +71,71 @@ public class Script_Enemy_Health : MonoBehaviour {
     {
         if (health <= 0) //if health is less than 0, destroys self.
         {
-            DestroySelf();
+            DestroySelf(true);
         }
 
-        bool selectHit = false;
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition); //raycasts from the camera to the mouse.
-
-        RaycastHit[] hits; //scans through all hits from the raycast.
-        hits = Physics.RaycastAll(ray);
-
-        for (int i = 0; i < hits.Length; i++)
+        if (!demo)
         {
-            if (hits[i].transform.gameObject == gameObject) //if the raycast hits a tower...
+
+            bool selectHit = false;
+            var ray = Camera.main.ScreenPointToRay(Input.mousePosition); //raycasts from the camera to the mouse.
+
+            RaycastHit[] hits; //scans through all hits from the raycast.
+            hits = Physics.RaycastAll(ray);
+
+            for (int i = 0; i < hits.Length; i++)
             {
-                selectHit = true;
+                if (hits[i].transform.gameObject == gameObject) //if the raycast hits a tower...
+                {
+                    selectHit = true;
+                }
             }
-        }
 
-        if (Input.GetButtonUp("Fire1"))
-        {
-            if (selectHit)
+            if (Input.GetButtonUp("Fire1"))
             {
-                selected = true;
+                if (selectHit)
+                {
+                    selected = true;
+                }
+                else selected = false;
             }
-            else selected = false;
-        }
 
-        if (!drawingCard)
-        {
-            if (selected)
+            if (!drawingCard)
             {
-                infocard = Instantiate(infoCard_prefab) as GameObject;
-                infocardData = infocard.GetComponent<Script_Infocard_Enemy>();
-                infocardData.health = this;
-                infocardData.movement = gameObject.GetComponent<Script_Enemy_Move>();
-                infocard.transform.SetParent(controller.UICanvas.transform);
-                drawingCard = true;
+                if (selected)
+                {
+                    infocard = Instantiate(infoCard_prefab) as GameObject;
+                    infocardData = infocard.GetComponent<Script_Infocard_Enemy>();
+                    infocardData.health = this;
+                    infocardData.movement = gameObject.GetComponent<Script_Enemy_Move>();
+                    infocard.transform.SetParent(controller.UICanvas.transform);
+                    drawingCard = true;
+                }
             }
-        }
-        else
-        {
-            infocardData.UpdateData();
-            RectTransform infoTrans = infocard.GetComponent<RectTransform>();
-            infoTrans.anchoredPosition = new Vector2(infoCard_x, infoCard_y);
-        }
-
-        if (!selected)
-        {
-            Destroy(infocard);
-            drawingCard = false;
-            projector.enabled = false;
-        }
-        else
-        {
-            projector.enabled = true;
-
-            int index = 0;
-            for (float i = 0f; index < numPoints; i = i + ((Mathf.PI * 2) / numPoints))
+            else
             {
-                projector.SetPosition(index++, new Vector3(transform.position.x + projectorRange * Mathf.Sin(i), transform.position.y + .5f, transform.position.z + projectorRange * Mathf.Cos(i)));
+                infocardData.UpdateData();
+                RectTransform infoTrans = infocard.GetComponent<RectTransform>();
+                infoTrans.anchoredPosition = new Vector2(infoCard_x, infoCard_y);
             }
-            projector.SetPosition(index++, new Vector3(transform.position.x + projectorRange * Mathf.Sin(0.0f), transform.position.y + .5f, transform.position.z + projectorRange * Mathf.Cos(0.0f)));
+
+            if (!selected)
+            {
+                Destroy(infocard);
+                drawingCard = false;
+                projector.enabled = false;
+            }
+            else
+            {
+                projector.enabled = true;
+
+                int index = 0;
+                for (float i = 0f; index < numPoints; i = i + ((Mathf.PI * 2) / numPoints))
+                {
+                    projector.SetPosition(index++, new Vector3(transform.position.x + projectorRange * Mathf.Sin(i), transform.position.y + .5f, transform.position.z + projectorRange * Mathf.Cos(i)));
+                }
+                projector.SetPosition(index++, new Vector3(transform.position.x + projectorRange * Mathf.Sin(0.0f), transform.position.y + .5f, transform.position.z + projectorRange * Mathf.Cos(0.0f)));
+            }
         }
 
 	}
@@ -160,10 +166,13 @@ public class Script_Enemy_Health : MonoBehaviour {
         health = maxHealth;
     }
 
-    public void DestroySelf()
+    public void DestroySelf(bool reward)
     {
         controller.GetEnemies().Remove(gameObject); //removes itself from the enemy list.
-        controller.Resources += resourceYield;
+        if (reward)
+        {
+            controller.Resources += resourceYield;
+        }
 
         if (drawingCard)
         {
