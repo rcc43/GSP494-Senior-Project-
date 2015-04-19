@@ -104,7 +104,7 @@ public class Script_Enemy_Health : MonoBehaviour {
             {
                 if (selected)
                 {
-                    infocard = Instantiate(infoCard_prefab) as GameObject;
+                    infocard = Instantiate(infoCard_prefab, new Vector3(-100, -100, -100), Quaternion.identity) as GameObject;
                     infocardData = infocard.GetComponent<Script_Infocard_Enemy>();
                     infocardData.health = this;
                     infocardData.movement = gameObject.GetComponent<Script_Enemy_Move>();

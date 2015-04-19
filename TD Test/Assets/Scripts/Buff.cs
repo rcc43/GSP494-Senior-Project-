@@ -65,6 +65,7 @@ public class Buff
         Script_Enemy_Move enemyMove = target.GetComponent<Script_Enemy_Move>(); // the movement script for an enemy.
         Script_Enemy_Health enemyStats = target.GetComponent<Script_Enemy_Health>(); //the health script for an enemy.
         Script_Tower towerStats = target.GetComponent<Script_Tower>(); //the script for a tower.
+        Script_HostileWeapon enemyWeapon = target.GetComponent<Script_HostileWeapon>();
 
         if (duration > 0)
         {
@@ -79,6 +80,10 @@ public class Buff
                         if (enemyMove != null)
                         {
                             enemyMove.speed *= ((100 - magnitude) / 100); //reduces the enemy's current speed.
+                        }
+                        if (enemyWeapon != null)
+                        {
+                            enemyWeapon.fireRate *= 1 + (magnitude / 100);
                         }
                     }
                     break;
@@ -139,6 +144,7 @@ public class Buff
         Script_Enemy_Move enemyMove = target.GetComponent<Script_Enemy_Move>();
         Script_Enemy_Health enemyStats = target.GetComponent<Script_Enemy_Health>();
         Script_Tower towerStats = target.GetComponent<Script_Tower>();
+        Script_HostileWeapon enemyWeapon = target.GetComponent<Script_HostileWeapon>();
 
         switch (type)
         {
@@ -151,6 +157,10 @@ public class Buff
                     if (enemyMove != null)
                     {
                         enemyMove.speed *= (100 / (100 - magnitude)); //reverses the effect of slowing.
+                    }
+                    if (enemyWeapon != null)
+                    {
+                        enemyWeapon.fireRate *= (100 / (100 + magnitude) );
                     }
                 }
                 break;

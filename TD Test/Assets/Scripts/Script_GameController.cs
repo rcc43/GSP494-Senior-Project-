@@ -32,6 +32,11 @@ public class Script_GameController : MonoBehaviour {
 
     int waveNum;
     public int startWaveSize;
+    public int waveIncreaseFactorMin = 3;
+    public int waveIncreaseFactorMax = 10;
+
+    public float healthScalingFactor = .2f;
+    public float resourceScalingFactor = .1f;
 
     float timeToWave = 0.0f;
 
@@ -375,7 +380,7 @@ public class Script_GameController : MonoBehaviour {
     void FormulateWave()
     {
         spawnQueue.Clear();
-        int attackSize = startWaveSize + waveNum + Random.Range(3, 10);
+        int attackSize = startWaveSize + waveNum + Random.Range(waveIncreaseFactorMin, waveIncreaseFactorMax);
         for (int i = 0; i < attackSize; i++)
         {
             spawnQueue.Add(FormationLedger.formationBlueprints[Random.Range(0, FormationLedger.formationBlueprints.Count)]);
@@ -413,10 +418,10 @@ public class Script_GameController : MonoBehaviour {
                     }
             }
             //scales up health/healing with level.
-            float healthFactor = waveNum * .1f + 1.0f;
+            float healthFactor = (Mathf.Pow( 1 + healthScalingFactor, waveNum)); // + 1.0f;
             Script_Enemy_Health memHealth = formation.members[i].GetComponent<Script_Enemy_Health>();
             memHealth.SetHealth(memHealth.maxHealth * healthFactor);
-            memHealth.resourceYield *= healthFactor;
+            memHealth.resourceYield = memHealth.resourceYield * (1.0f * (waveNum + 1) * resourceScalingFactor);
             Script_AreaEffect area = formation.members[i].GetComponent<Script_AreaEffect>();
             if (area != null)
             {
@@ -431,7 +436,6 @@ public class Script_GameController : MonoBehaviour {
 
     IEnumerator SpawnWave()
     {
-        waveNum++;
         FormulateWave();
         yield return new WaitForSeconds(betweenWavePause);
         for (int i = 0; i < spawnQueue.Count; i++)
@@ -439,6 +443,7 @@ public class Script_GameController : MonoBehaviour {
             StartCoroutine(SpawnFormation(spawnQueue[i]));
             yield return new WaitForSeconds((spawnQueue[i].spawnList.Count * inFormationPause) + betweenFormationPause);
         }
+        waveNum++;
     }
 
     IEnumerator StartGame()
