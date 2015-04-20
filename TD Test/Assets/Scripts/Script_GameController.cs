@@ -57,6 +57,7 @@ public class Script_GameController : MonoBehaviour {
     public GUISkin basicSkin;
     public GUISkin buffedSkin;
     public GUISkin debuffSkin;
+    public GUISkin failureSkin;
 
     GameObject selectedEnemy;
 
@@ -193,7 +194,8 @@ public class Script_GameController : MonoBehaviour {
 
             if (defeated)
             {
-                GUI.Label(new Rect(350f, 300.0f, 80.0f, 70.0f), "Base Destroyed.");
+                GUI.skin = failureSkin;
+                GUI.Label(new Rect((Screen.width /2) - 100 , Screen.height/2, 200.0f, 70.0f), "Base Destroyed!");
             }
         }
     }
@@ -421,7 +423,7 @@ public class Script_GameController : MonoBehaviour {
             float healthFactor = (Mathf.Pow( 1 + healthScalingFactor, waveNum)); // + 1.0f;
             Script_Enemy_Health memHealth = formation.members[i].GetComponent<Script_Enemy_Health>();
             memHealth.SetHealth(memHealth.maxHealth * healthFactor);
-            memHealth.resourceYield = memHealth.resourceYield * (1.0f * (waveNum + 1) * resourceScalingFactor);
+            memHealth.resourceYield = memHealth.resourceYield * ((waveNum + 1) * resourceScalingFactor);
             Script_AreaEffect area = formation.members[i].GetComponent<Script_AreaEffect>();
             if (area != null)
             {

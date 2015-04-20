@@ -7,6 +7,8 @@ public class Script_GhostTower : MonoBehaviour {
 
     Color projectorColor;
 
+    public AudioClip placement;
+
     public GameObject spawnedTower; //prefab of the tower that is created by this ghost.
     public float alpha = .5f; //the transparency of the ghost.
     public float height = 1.0f; //the height of the tower (so that the ghost doesn't clip through the ground).
@@ -48,8 +50,6 @@ public class Script_GhostTower : MonoBehaviour {
         projector.material = new Material(Shader.Find("Particles/Additive"));
         projector.SetColors(projectorColor, projectorColor);
         projector.SetWidth(.1f, .1f);
-
-
 	}
 	
 	// Update is called once per frame
@@ -80,7 +80,7 @@ public class Script_GhostTower : MonoBehaviour {
                 transform.position = Camera.main.ScreenToWorldPoint(drawPos);
             }
 
-            if (Input.GetButton("Fire1")) //if the left mouse is hit... 
+            if (Input.GetButtonUp("Fire1")) //if the left mouse is hit... 
             {
                 if (foundLocation && groundTarget != null && controller != null) //checks if the ground already has a tower on it.
                 {
@@ -88,9 +88,11 @@ public class Script_GhostTower : MonoBehaviour {
                     {
                         if (controller.EnoughResources(cost))
                         {
+                            audio.clip = placement;
+                            audio.Play();
                             GameObject newTower = Instantiate(spawnedTower, transform.position, transform.rotation) as GameObject; //if not, builds a tower at this location.
                             groundTarget.tower = newTower;
-                            Destroy(gameObject);
+                            //Destroy(gameObject);
                             controller.building = false;
                             controller.GetTowers().Add(newTower);
                         }
