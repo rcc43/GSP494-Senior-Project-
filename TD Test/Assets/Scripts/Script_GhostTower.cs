@@ -88,11 +88,11 @@ public class Script_GhostTower : MonoBehaviour {
                     {
                         if (controller.EnoughResources(cost))
                         {
-                            audio.clip = placement;
-                            audio.Play();
+                            controller.audio.clip = placement;
+                            controller.audio.Play();
                             GameObject newTower = Instantiate(spawnedTower, transform.position, transform.rotation) as GameObject; //if not, builds a tower at this location.
                             groundTarget.tower = newTower;
-                            //Destroy(gameObject);
+                            Destroy(gameObject);
                             controller.building = false;
                             controller.GetTowers().Add(newTower);
                         }
