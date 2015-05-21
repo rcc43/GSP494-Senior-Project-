@@ -33,6 +33,7 @@ public class Script_Infocard_Enemy : MonoBehaviour {
             text[1].text = health.health.ToString("F1") + "/" + health.maxHealth.ToString("F1");
             text[2].text = "Speed: " + movement.speed.ToString("F1") + "/" + movement.baseSpeed.ToString("F1");
             text[3].text = movement.description;
+            text[4].text = "Distance: " + movement.distance;
         }
 
         if (healthBar)

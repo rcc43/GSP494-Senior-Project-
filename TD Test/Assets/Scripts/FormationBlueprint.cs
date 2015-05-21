@@ -5,6 +5,7 @@ public enum enemyType : int { standard, tank, healer, flyer };
 
 public class FormationBlueprint
 {
+    public int size = 0;
     public List<enemyType> spawnList = new List<enemyType>();
 
     public FormationBlueprint()
@@ -24,6 +25,7 @@ static class FormationLedger
         formationBlueprints = new List<FormationBlueprint>();
 
         FormationBlueprint blueprint = new FormationBlueprint();
+        blueprint.size = 3;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
@@ -31,6 +33,7 @@ static class FormationLedger
         formationBlueprints.Add(blueprint);
 
         blueprint = new FormationBlueprint();
+        blueprint.size = 3;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.healer);
         blueprint.spawnList.Add(enemyType.standard);
@@ -38,6 +41,7 @@ static class FormationLedger
         formationBlueprints.Add(blueprint);
 
         blueprint = new FormationBlueprint();
+        blueprint.size = 3;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.healer);
@@ -46,6 +50,7 @@ static class FormationLedger
 
 
         blueprint = new FormationBlueprint();
+        blueprint.size = 3;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.tank);
         blueprint.spawnList.Add(enemyType.standard);
@@ -53,6 +58,7 @@ static class FormationLedger
         formationBlueprints.Add(blueprint);
 
         blueprint = new FormationBlueprint();
+        blueprint.size = 4;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.healer);
@@ -61,6 +67,7 @@ static class FormationLedger
         formationBlueprints.Add(blueprint);
         
         blueprint = new FormationBlueprint();
+        blueprint.size = 4;
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.flyer);

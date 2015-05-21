@@ -17,15 +17,15 @@ public class Script_Enemy_Move : MonoBehaviour {
 
     public float speed; //the movement speed of the entity, with debuffs/buffs factored in.
 
+    public float distance; //distance along the road.
+
     Script_Road tgtRoad; //the script of a target road piece.
     public Formation formation;
 
 	// Use this for initialization
 	void Start ()
     {
-
         speed = baseSpeed; //sets up initial speed.
-
         if (flying == false) //if the enemy is a non-flying one, targets the ground it spawns on.
         {
             Ray ray = new Ray(transform.position, new Vector3(0.0f, -1.0f, 0.0f)); //raycasts downward for the road piece it is on.
@@ -38,7 +38,30 @@ public class Script_Enemy_Move : MonoBehaviour {
                 if (hits[i].transform.gameObject.tag == "Road") //if the hit is a road, sets it as the target.
                 {
                     tgt = hits[i].transform.gameObject;
+                }
+            }
 
+            Script_Road projectionRoad = tgt.GetComponent<Script_Road>();
+            if (formation.IsFirst(gameObject))
+            {
+                while (projectionRoad.next[0] != null)
+                {
+                    if (projectionRoad.numBranches > 1)
+                    {
+                        if (formation != null)
+                        {
+                                int rand = Random.Range(0, projectionRoad.numBranches);
+                                formation.AddChoice(rand);
+                                projectionRoad = projectionRoad.next[rand].GetComponent<Script_Road>();
+                        }
+                    }
+                    else
+                    {
+                        if (projectionRoad.next[0] != null)
+                        {
+                        projectionRoad = projectionRoad.next[0].GetComponent<Script_Road>();
+                        }
+                    }
                 }
             }
         }
@@ -49,6 +72,7 @@ public class Script_Enemy_Move : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
+        EvaluateDistance();
         if (flying == false)
         {
             tgtRoad = tgt.GetComponent<Script_Road>(); //gets the script of the road piece it is targeting.
@@ -60,6 +84,7 @@ public class Script_Enemy_Move : MonoBehaviour {
                 {
                     if (formation != null)
                     {
+                        /*
                         if (formation.IsFirst(gameObject))
                         {
                             int rand = Random.Range(0, tgtRoad.numBranches);
@@ -73,6 +98,7 @@ public class Script_Enemy_Move : MonoBehaviour {
                         }
                         else
                         {
+                         * */
                             int branchChoice = formation.GetChoice(gameObject);
                             formation.positionUp(gameObject);
                             if (tgtRoad.next[branchChoice] != null) //checks if the target road points to a new road piece.
@@ -80,7 +106,7 @@ public class Script_Enemy_Move : MonoBehaviour {
                                 tgt = tgtRoad.next[branchChoice]; //if so, sets that piece as the new target, gets its script.
                                 tgtRoad = tgt.GetComponent<Script_Road>();
                             }
-                        }
+                        //}
                     }
                     else
                     {
@@ -122,4 +148,38 @@ public class Script_Enemy_Move : MonoBehaviour {
             }
         }
 	}
+
+    public float EvaluateDistance()
+    {
+        if (!flying)
+        {
+            distance = Vector3.Distance(gameObject.transform.position, tgt.transform.position);
+            Script_Road projectionRoad = tgt.GetComponent<Script_Road>();
+            int choice = 0;
+            while (projectionRoad.next[0] != null)
+            {
+                if (projectionRoad.numBranches > 1)
+                {
+                    if (formation != null)
+                    {
+                        projectionRoad = projectionRoad.next[formation.choices[choice]].GetComponent<Script_Road>();
+                        choice++;
+                    }
+                }
+                else
+                {
+                    if (projectionRoad.next[0] != null)
+                    {
+                        projectionRoad = projectionRoad.next[0].GetComponent<Script_Road>();
+                    }
+                }
+                distance += 1;
+            }
+        }
+        else
+        {
+            distance = Vector3.Distance(gameObject.transform.position, gameObject.GetComponent<Script_Enemy_Health>().controller.Base.transform.position);
+        }
+        return distance;
+    }
 }

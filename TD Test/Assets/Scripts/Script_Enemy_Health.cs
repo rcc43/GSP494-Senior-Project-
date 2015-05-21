@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class Script_Enemy_Health : MonoBehaviour {
 
 
-    public GameObject GameController; //reference to gamecontroller.
+    GameObject GameController; //reference to gamecontroller.
     public float maxHealth = 20;
     public float health; //health value.
 
@@ -14,7 +14,7 @@ public class Script_Enemy_Health : MonoBehaviour {
 
     public float resourceYield;
 
-    Script_GameController controller; //the gamecontroller script.
+    public Script_GameController controller; //the gamecontroller script.
     Script_BuffList buffs; //the buffs applied to this entity.
 
     public GameObject infoCard_prefab;
@@ -169,6 +169,7 @@ public class Script_Enemy_Health : MonoBehaviour {
     public void DestroySelf(bool reward)
     {
         controller.GetEnemies().Remove(gameObject); //removes itself from the enemy list.
+        controller.waveSize--;
         if (reward)
         {
             controller.Resources += resourceYield;

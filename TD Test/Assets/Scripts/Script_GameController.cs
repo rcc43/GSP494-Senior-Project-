@@ -8,6 +8,7 @@ using System.Collections;
 public class Script_GameController : MonoBehaviour {
 
     public bool demo = false;
+    public bool campaign = false;
 
     public GameObject[] enemyRoster;
 
@@ -47,6 +48,12 @@ public class Script_GameController : MonoBehaviour {
 
     public float defeatTimer = 0.0f;
     public bool defeated = false;
+
+    public float winTimer = 0.0f;
+    public bool win = false;
+
+    public int waveLimit = 5;
+    public int waveSize = 0;
 
     public List<FormationBlueprint> spawnQueue = new List<FormationBlueprint>();
 
@@ -161,12 +168,28 @@ public class Script_GameController : MonoBehaviour {
             insufficentResources = false;
         }
 
+        if (campaign && !win && waveNum == waveLimit && waveSize == 0 && enemies.Count == 0)
+        {
+            win = true;
+            winTimer = 5.0f;
+        }
+
         if (defeated)
         {
             defeatTimer -= Time.deltaTime;
             if (defeatTimer <= 0)
             {
                 defeated = false;
+                ResetLevel();
+            }
+        }
+
+        if (win)
+        {
+            winTimer -= Time.deltaTime;
+            if (winTimer <= 0)
+            {
+                win = false;
                 ResetLevel();
             }
         }
@@ -184,21 +207,31 @@ public class Script_GameController : MonoBehaviour {
     {
         if (!demo)
         {
-            GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
-            if (insufficentResources == true)
+            if (!win)
             {
-                GUI.skin = debuffSkin;
+                GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+                GUI.Label(new Rect(0.0f, 60.0f, 100.0f, 70.0f), "Enemies Left: " + waveSize.ToString("F0"));
+                if (insufficentResources == true)
+                {
+                    GUI.skin = debuffSkin;
+                }
+                else
+                {
+                    GUI.skin = basicSkin;
+                }
+                GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
             }
-            else
-            {
-                GUI.skin = basicSkin;
-            }
-            GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
 
             if (defeated)
             {
                 GUI.skin = failureSkin;
                 GUI.Label(new Rect((Screen.width /2) - 100 , Screen.height/2, 200.0f, 70.0f), "Base Destroyed!");
+            }
+
+            if (win)
+            {
+                GUI.skin = failureSkin;
+                GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "You Win!");
             }
         }
     }
@@ -216,13 +249,12 @@ public class Script_GameController : MonoBehaviour {
     }
 
     //creates a basic enemy.
-    GameObject SpawnBaseEnemy()
+    GameObject SpawnBaseEnemy(int spawnSpot)
     {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            int rand = Random.Range(0, SpawnRoad.Length);
-            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
+            spawnPos = SpawnRoad[spawnSpot].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[0].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
         
@@ -234,13 +266,12 @@ public class Script_GameController : MonoBehaviour {
         return newEnemy;
     }
 
-    GameObject SpawnHercules()
+    GameObject SpawnHercules(int spawnSpot)
     {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            int rand = Random.Range(0, SpawnRoad.Length);
-            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
+            spawnPos = SpawnRoad[spawnSpot].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[2].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
 
@@ -252,13 +283,12 @@ public class Script_GameController : MonoBehaviour {
         return newEnemy;
     }
 
-    GameObject SpawnChiron()
+    GameObject SpawnChiron(int spawnSpot)
     {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            int rand = Random.Range(0, SpawnRoad.Length);
-            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
+            spawnPos = SpawnRoad[spawnSpot].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[3].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
 
@@ -387,11 +417,16 @@ public class Script_GameController : MonoBehaviour {
 
     void FormulateWave()
     {
+        //waveSize = 0;
         spawnQueue.Clear();
         int attackSize = startWaveSize + waveNum + Random.Range(waveIncreaseFactorMin, waveIncreaseFactorMax);
         for (int i = 0; i < attackSize; i++)
         {
             spawnQueue.Add(FormationLedger.formationBlueprints[Random.Range(0, FormationLedger.formationBlueprints.Count)]);
+        }
+        for (int i = 0; i < spawnQueue.Count; i++)
+        {
+            waveSize += spawnQueue[i].size;
         }
     }
 
@@ -399,6 +434,7 @@ public class Script_GameController : MonoBehaviour {
     {
         Formation formation = new Formation();
         formation.Init(blueprint.spawnList.Count);
+        int spawnPlace = Random.Range(0, SpawnRoad.Length);
 
         for (int i = 0; i < blueprint.spawnList.Count; i++)
         {
@@ -406,17 +442,17 @@ public class Script_GameController : MonoBehaviour {
             {
                 case enemyType.standard:
                     {
-                        formation.members[i] = SpawnBaseEnemy();
+                        formation.members[i] = SpawnBaseEnemy(spawnPlace);
                         break;
                     }
                 case enemyType.tank:
                     {
-                        formation.members[i] = SpawnHercules();
+                        formation.members[i] = SpawnHercules(spawnPlace);
                         break;
                     }
                 case enemyType.healer:
                     {
-                        formation.members[i] = SpawnChiron();
+                        formation.members[i] = SpawnChiron(spawnPlace);
                         break;
                     }
                 case enemyType.flyer:
@@ -458,13 +494,27 @@ public class Script_GameController : MonoBehaviour {
     {
         timeToWave = startGamePause;
         yield return new WaitForSeconds(startGamePause);
-        while (true)
+        if (campaign)
         {
-            Debug.Log("Starting Wave " + (waveNum + 1).ToString());
-            StartCoroutine(SpawnWave());
-            float waveLength = CalculateWaveLength();
-            timeToWave = waveLength;
-            yield return new WaitForSeconds(waveLength);
+            while (waveNum < waveLimit)
+            {
+                Debug.Log("Starting Wave " + (waveNum + 1).ToString());
+                StartCoroutine(SpawnWave());
+                float waveLength = CalculateWaveLength();
+                timeToWave = waveLength;
+                yield return new WaitForSeconds(waveLength);
+            }
+        }
+        else
+        {
+            while (true)
+            {
+                Debug.Log("Starting Wave " + (waveNum + 1).ToString());
+                StartCoroutine(SpawnWave());
+                float waveLength = CalculateWaveLength();
+                timeToWave = waveLength;
+                yield return new WaitForSeconds(waveLength);
+            }
         }
     }
 
