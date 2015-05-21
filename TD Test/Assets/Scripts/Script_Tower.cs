@@ -23,6 +23,8 @@ public class Script_Tower : MonoBehaviour {
 
     public GameObject GameController;
     public GameObject[] weapons;
+    public GameObject head;
+    public GameObject gun;
     public float range = 15.0f;
 
     public int numPoints = 10;
@@ -249,7 +251,8 @@ public class Script_Tower : MonoBehaviour {
             {
                 if (tgt[i] != null)
                 {
-                    weapons[i].transform.LookAt(tgt[i].transform);
+                    head.transform.eulerAngles = new Vector3(0.0f, (180 / Mathf.PI) * Mathf.Atan2((tgt[i].transform.position.x - head.transform.position.x), tgt[i].transform.position.z - head.transform.position.z), 0.0f); // weapons[i].transform.LookAt(tgt[i].transform);
+                    gun.transform.localRotation = new Quaternion(Mathf.Atan2(-(gun.transform.position.y - tgt[i].transform.position.y), -Mathf.Sqrt (Mathf.Pow((gun.transform.position.x - tgt[i].transform.position.x), 2) + Mathf.Pow((gun.transform.position.z - tgt[i].transform.position.z),2.0f))), 0.0f, 0.0f, 1.0f);         
                     if (buff != null)
                     {
                         if (weaponTargeting[i].Fire(tgt[i]))

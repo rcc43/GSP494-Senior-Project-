@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script_GameController3.cs" />
      <Compile Include="Assets\Scripts\Buff.cs" />
      <Compile Include="Assets\Scripts\Formation.cs" />
      <Compile Include="Assets\Scripts\FormationBlueprint.cs" />

@@ -20,7 +20,9 @@ static class FormationLedger
 
     public static void Init()
     {
+        
         formationBlueprints = new List<FormationBlueprint>();
+
         FormationBlueprint blueprint = new FormationBlueprint();
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);
@@ -57,7 +59,7 @@ static class FormationLedger
         blueprint.spawnList.Add(enemyType.tank);
 
         formationBlueprints.Add(blueprint);
-
+        
         blueprint = new FormationBlueprint();
         blueprint.spawnList.Add(enemyType.standard);
         blueprint.spawnList.Add(enemyType.standard);

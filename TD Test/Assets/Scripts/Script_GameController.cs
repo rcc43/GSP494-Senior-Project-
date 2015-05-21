@@ -14,7 +14,7 @@ public class Script_GameController : MonoBehaviour {
     public GameObject[] towerGhostPrefabs; //the prefab for the test tower placement ghost.
     public GameObject[] towerPrefabs;
 
-    public GameObject SpawnRoad; //the road where the enemy will spawn.
+    public GameObject[] SpawnRoad; //the road where the enemy will spawn.
     public GameObject[] flyerSpawns; //locations that flying units will spawn.
     public Vector3 spawnMove; //this is the direction entities will move upon spawning.
 
@@ -99,10 +99,13 @@ public class Script_GameController : MonoBehaviour {
     {
 
         ground = GameObject.FindGameObjectsWithTag("Ground");
-        Script_Road spawnRoadTile = SpawnRoad.GetComponent<Script_Road>();
-        if (spawnRoadTile != null)
+        for (int i = 0; i < SpawnRoad.Length; i++)
         {
-            spawnRoadTile.FindNext(spawnMove);
+            Script_Road spawnRoadTile = SpawnRoad[i].GetComponent<Script_Road>();
+            if (spawnRoadTile != null)
+            {
+                spawnRoadTile.FindNext(spawnMove);
+            }
         }
 
         if (!demo)
@@ -218,7 +221,8 @@ public class Script_GameController : MonoBehaviour {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            spawnPos = SpawnRoad.transform.position; //creates position hovering over origin.
+            int rand = Random.Range(0, SpawnRoad.Length);
+            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[0].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
         
@@ -235,7 +239,8 @@ public class Script_GameController : MonoBehaviour {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            spawnPos = SpawnRoad.transform.position; //creates position hovering over origin.
+            int rand = Random.Range(0, SpawnRoad.Length);
+            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[2].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
 
@@ -252,7 +257,8 @@ public class Script_GameController : MonoBehaviour {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (SpawnRoad != null)
         {
-            spawnPos = SpawnRoad.transform.position; //creates position hovering over origin.
+            int rand = Random.Range(0, SpawnRoad.Length);
+            spawnPos = SpawnRoad[rand].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[3].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
 
