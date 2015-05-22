@@ -27,6 +27,9 @@ public class Script_Tower : MonoBehaviour {
     public GameObject gun;
     public float range = 15.0f;
 
+    public GameObject statusIndicatorPrefab;
+    GameObject statusIndicator;
+
     public int numPoints = 10;
 
     public float baseDamage = 10.0f;
@@ -93,6 +96,11 @@ public class Script_Tower : MonoBehaviour {
         projector.SetWidth(.1f, .1f);
         projector.enabled = false;
 
+        statusIndicator = Instantiate(statusIndicatorPrefab) as GameObject;
+        statusIndicator.transform.SetParent(controller.UICanvas.transform, false);
+        statusIndicator.transform.position = Camera.main.WorldToScreenPoint(transform.position);
+        statusIndicator.SetActive(false);
+
         audio.clip = fire;
 
         UpdateStats();
@@ -137,6 +145,15 @@ public class Script_Tower : MonoBehaviour {
             else projector.enabled = false;
 
             UpdateStats();
+        }
+
+        if (stunned)
+        {
+            statusIndicator.SetActive(true);
+        }
+        else
+        {
+            statusIndicator.SetActive(false);
         }
 
         targets.Clear();
