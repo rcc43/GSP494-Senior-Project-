@@ -10,6 +10,9 @@ public class Script_GameController : MonoBehaviour {
     public bool demo = false;
     public bool campaign = false;
 
+    public GameObject campaignSave;
+    public Script_CampaignData campaignData;
+
     public GameObject[] enemyRoster;
 
     public GameObject[] towerGhostPrefabs; //the prefab for the test tower placement ghost.
@@ -78,6 +81,7 @@ public class Script_GameController : MonoBehaviour {
     GameObject bottomBar;
     public GameObject healthBar_prefab;
     GameObject healthBar;
+    public GameObject briefing;
 
     int BuildButtons_X;
     public int BuildButtons_StartY;
@@ -104,6 +108,22 @@ public class Script_GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
+
+        campaignSave = GameObject.FindWithTag("CampaignDataSave");
+        if (campaignSave)
+        {
+            campaignData = campaignSave.GetComponent<Script_CampaignData>();
+        }
+        if (campaignData)
+        {
+            campaign = campaignData.isCampaign;
+        }
+
+        if (campaign && !demo)
+        {
+            Time.timeScale = 0.0f;
+            briefing.SetActive(true);
+        }
 
         ground = GameObject.FindGameObjectsWithTag("Ground");
         for (int i = 0; i < SpawnRoad.Length; i++)
@@ -168,11 +188,24 @@ public class Script_GameController : MonoBehaviour {
             insufficentResources = false;
         }
 
+        if (campaign)
+        {
+            if (!win && waveNum == waveLimit && waveSize == 0 && enemies.Count == 0)
+            {
+                win = true;
+                winTimer = 5.0f;
+            }
+        }
+
+        /*
         if (campaign && !win && waveNum == waveLimit && waveSize == 0 && enemies.Count == 0)
         {
             win = true;
             winTimer = 5.0f;
         }
+         * */
+        if (!demo)
+        {
 
         if (defeated)
         {
@@ -190,12 +223,29 @@ public class Script_GameController : MonoBehaviour {
             if (winTimer <= 0)
             {
                 win = false;
-                ResetLevel();
+                if (campaign)
+                {
+                    if (campaignData.campaignQueue.Count > 0)
+                    {
+                        campaignData.campaignQueue.RemoveAt(0);
+                    }
+                    if (campaignData.campaignQueue.Count > 0)
+                    {
+                        Application.LoadLevel(campaignData.campaignQueue[0]);
+                    }
+                    else
+                    {
+                        ResetLevel();
+                    }
+                }
+                else
+                {
+                    ResetLevel();
+                }
             }
         }
 
-        if (!demo)
-        {
+        
             if (Input.GetKey(KeyCode.Escape))
             {
                 Pause();
@@ -211,6 +261,10 @@ public class Script_GameController : MonoBehaviour {
             {
                 GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
                 GUI.Label(new Rect(0.0f, 60.0f, 100.0f, 70.0f), "Enemies Left: " + waveSize.ToString("F0"));
+                if (campaign)
+                {
+                    GUI.Label(new Rect(0.0f, 90.0f, 100.0f, 70.0f), "Waves Left: " + (waveLimit-waveNum).ToString("F0"));
+                }
                 if (insufficentResources == true)
                 {
                     GUI.skin = debuffSkin;

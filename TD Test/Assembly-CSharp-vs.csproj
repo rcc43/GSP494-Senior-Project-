@@ -53,7 +53,9 @@
      <Compile Include="Assets\Scripts\LevelLayout.cs" />
      <Compile Include="Assets\Scripts\Script_AreaEffect.cs" />
      <Compile Include="Assets\Scripts\Script_Base.cs" />
+     <Compile Include="Assets\Scripts\Script_Briefing.cs" />
      <Compile Include="Assets\Scripts\Script_BuffList.cs" />
+     <Compile Include="Assets\Scripts\Script_CampaignData.cs" />
      <Compile Include="Assets\Scripts\Script_Colorize.cs" />
      <Compile Include="Assets\Scripts\Script_DemoGameController.cs" />
      <Compile Include="Assets\Scripts\Script_DestroyByContact.cs" />

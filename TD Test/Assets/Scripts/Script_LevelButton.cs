@@ -13,11 +13,17 @@ public class Script_LevelButton : MonoBehaviour
 
     EventTrigger trigger;
 
+    GameObject CampaignSave;
+    Script_CampaignData CampaignData;
+
     // Use this for initialization
     void Start()
     {
         MenuController = GameObject.FindWithTag("MenuController");
         controller = MenuController.GetComponent<Script_MenuController>();
+
+        CampaignSave = GameObject.FindWithTag("CampaignDataSave");
+        CampaignData = CampaignSave.GetComponent<Script_CampaignData>();
 
         trigger = GetComponent<EventTrigger>();
         EventTrigger.Entry onEnter = new EventTrigger.Entry();
@@ -39,7 +45,17 @@ public class Script_LevelButton : MonoBehaviour
 
     void LoadLevel()
     {
-        Application.LoadLevel(level.loadName);
+        if (!level.campaign)
+        {
+            CampaignData.isCampaign = false;
+            Application.LoadLevel(level.loadName[0]);
+        }
+        else
+        {
+            CampaignData.isCampaign = true;
+            CampaignData.campaignQueue = level.loadName;
+            Application.LoadLevel(level.loadName[0]);
+        }
     }
 
 }

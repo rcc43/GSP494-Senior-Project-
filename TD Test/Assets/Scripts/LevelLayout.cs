@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 [Serializable]
 public class LevelLayout
 {
 
-    public string loadName;
+    public List<string> loadName;
     public string name;
     public string description;
+    public bool campaign;
 
 	// Use this for initialization
 	void Start () {
