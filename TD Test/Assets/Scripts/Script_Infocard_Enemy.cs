@@ -8,6 +8,7 @@ public class Script_Infocard_Enemy : MonoBehaviour {
     public Text[] text;
     public Script_Enemy_Health health;
     public Script_Enemy_Move movement;
+    public Script_BossMove bossMove;
 
     Script_HealthBar healthBar;
 
@@ -27,13 +28,24 @@ public class Script_Infocard_Enemy : MonoBehaviour {
     {
 
         text = gameObject.GetComponentsInChildren<Text>();
-        if (health && movement)
+        if (health != null)
+        {
+            text[1].text = health.health.ToString("F1") + "/" + health.maxHealth.ToString("F1");
+        }
+        if (movement != null)
         {
             text[0].text = movement.enemyName;
-            text[1].text = health.health.ToString("F1") + "/" + health.maxHealth.ToString("F1");
             text[2].text = "Speed: " + movement.speed.ToString("F1") + "/" + movement.baseSpeed.ToString("F1");
             text[3].text = movement.description;
             text[4].text = "Distance: " + movement.distance;
+        }
+        else if (bossMove != null)
+        {
+            text[0].text = bossMove.enemyName;
+            text[2].text = "Speed: " + bossMove.speed.ToString("F1") + "/" + bossMove.baseSpeed.ToString("F1");
+            text[3].text = bossMove.description;
+            text[4].text = "";
+
         }
 
         if (healthBar)

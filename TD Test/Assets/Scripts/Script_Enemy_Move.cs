@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Script_Enemy_Move : MonoBehaviour {
-
+public class Script_Enemy_Move : MonoBehaviour
+{
     public bool flying = false;
     public float diveRange = 10.0f; //the range at which a flying unit will dive at the base.
 
@@ -21,6 +21,10 @@ public class Script_Enemy_Move : MonoBehaviour {
 
     Script_Road tgtRoad; //the script of a target road piece.
     public Formation formation;
+
+    public float aerialDisplacementTime;
+    public float aerialDisplacementSpeed;
+    public Vector3 aerialDisplacementDir;
 
 	// Use this for initialization
 	void Start ()
@@ -66,7 +70,8 @@ public class Script_Enemy_Move : MonoBehaviour {
             }
         }
         else tgt = GameObject.FindWithTag("Base");
-
+        //aerialDispalacementTime = 0;
+        //aerialDisplacementDir = new Vector3(0, 0, 0);
 	}
 	
 	// Update is called once per frame
@@ -136,15 +141,23 @@ public class Script_Enemy_Move : MonoBehaviour {
         }
         else
         {
-            if (Vector3.Distance(tgt.transform.position, transform.position) > diveRange)
+            if (aerialDisplacementTime <= 0)
             {
-                transform.forward = (tgt.transform.position + new Vector3(0.0f, aboveHeight, 0.0f)) - transform.position;
+                if (Vector3.Distance(tgt.transform.position, transform.position) > diveRange)
+                {
+                    transform.forward = (tgt.transform.position + new Vector3(0.0f, aboveHeight, 0.0f)) - transform.position;
+                }
+                else
+                {
+                    transform.forward = tgt.transform.position - transform.position;
+                }
                 rigidbody.velocity = transform.forward * speed;
             }
             else
             {
-                transform.forward = tgt.transform.position - transform.position;
-                rigidbody.velocity = transform.forward * speed;
+                aerialDisplacementTime -= Time.deltaTime;
+                transform.forward = aerialDisplacementDir;
+                rigidbody.velocity = transform.forward * aerialDisplacementSpeed;
             }
         }
 	}

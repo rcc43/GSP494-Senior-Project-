@@ -2,6 +2,8 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
+using System;
+
 
 
 //drives the game
@@ -9,11 +11,13 @@ public class Script_GameController : MonoBehaviour {
 
     public bool demo = false;
     public bool campaign = false;
+    public bool boss = false;
 
     public GameObject campaignSave;
     public Script_CampaignData campaignData;
 
     public GameObject[] enemyRoster;
+    public GameObject boss_Prefab;
 
     public GameObject[] towerGhostPrefabs; //the prefab for the test tower placement ghost.
     public GameObject[] towerPrefabs;
@@ -61,8 +65,10 @@ public class Script_GameController : MonoBehaviour {
     public List<FormationBlueprint> spawnQueue = new List<FormationBlueprint>();
 
     List<GameObject> towers = new List<GameObject>(); //a list of towers in the game.
-    List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
+    public List<GameObject> enemies = new List<GameObject>(); //a list of enemies in the game.
     GameObject[] ground;
+
+    public Box bounds;
 
     public GUISkin basicSkin;
     public GUISkin buffedSkin;
@@ -190,7 +196,7 @@ public class Script_GameController : MonoBehaviour {
 
         if (campaign)
         {
-            if (!win && waveNum == waveLimit && waveSize == 0 && enemies.Count == 0)
+            if (!win && waveNum == waveLimit + Convert.ToInt32(boss) && waveSize == 0 && enemies.Count == 0)
             {
                 win = true;
                 winTimer = 5.0f;
@@ -259,11 +265,19 @@ public class Script_GameController : MonoBehaviour {
         {
             if (!win)
             {
-                GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+
                 GUI.Label(new Rect(0.0f, 60.0f, 100.0f, 70.0f), "Enemies Left: " + waveSize.ToString("F0"));
                 if (campaign)
                 {
-                    GUI.Label(new Rect(0.0f, 90.0f, 100.0f, 70.0f), "Waves Left: " + (waveLimit-waveNum).ToString("F0"));
+                    GUI.Label(new Rect(0.0f, 90.0f, 100.0f, 70.0f), "Waves Left: " + ((waveLimit + Convert.ToInt32(boss)) - waveNum).ToString("F0"));
+                    if (waveNum < waveLimit + Convert.ToInt32(boss))
+                    {
+                        GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+                    }
+                }
+                else
+                {
+                    GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
                 }
                 if (insufficentResources == true)
                 {
@@ -359,7 +373,7 @@ public class Script_GameController : MonoBehaviour {
         Vector3 spawnPos = new Vector3(0, 0, 0);
         if (flyerSpawns != null)
         {
-            int spawnSpot = Random.Range(0, flyerSpawns.Length);
+            int spawnSpot = UnityEngine.Random.Range(0, flyerSpawns.Length);
             spawnPos = flyerSpawns[spawnSpot].transform.position; //creates position hovering over origin.
             spawnPos.y += enemyRoster[1].GetComponent<Script_Enemy_Move>().aboveHeight;
         }
@@ -370,6 +384,24 @@ public class Script_GameController : MonoBehaviour {
         enemies.Add(newEnemy); //adds the enemy to the enemy list.
         return newEnemy;
     }
+
+    void SpawnBoss()
+    {
+        Vector3 spawnPos = new Vector3(0, 0, 0);
+        if (flyerSpawns != null)
+        {
+            int spawnSpot = UnityEngine.Random.Range(0, flyerSpawns.Length);
+            spawnPos = flyerSpawns[spawnSpot].transform.position; //creates position hovering over origin.
+            spawnPos.y += 5;
+        }
+        Quaternion spawnRot = Quaternion.identity; //creates default facing.
+
+        GameObject newEnemy; //creates a new enemy.
+        newEnemy = Instantiate(boss_Prefab, spawnPos, spawnRot) as GameObject;
+        enemies.Add(newEnemy); //adds the enemy to the enemy list.
+        waveSize += 1;
+    }
+
 
 
     public void ResetLevel()
@@ -473,10 +505,10 @@ public class Script_GameController : MonoBehaviour {
     {
         //waveSize = 0;
         spawnQueue.Clear();
-        int attackSize = startWaveSize + waveNum + Random.Range(waveIncreaseFactorMin, waveIncreaseFactorMax);
+        int attackSize = startWaveSize + waveNum + UnityEngine.Random.Range(waveIncreaseFactorMin, waveIncreaseFactorMax);
         for (int i = 0; i < attackSize; i++)
         {
-            spawnQueue.Add(FormationLedger.formationBlueprints[Random.Range(0, FormationLedger.formationBlueprints.Count)]);
+            spawnQueue.Add(FormationLedger.formationBlueprints[UnityEngine.Random.Range(0, FormationLedger.formationBlueprints.Count)]);
         }
         for (int i = 0; i < spawnQueue.Count; i++)
         {
@@ -488,7 +520,7 @@ public class Script_GameController : MonoBehaviour {
     {
         Formation formation = new Formation();
         formation.Init(blueprint.spawnList.Count);
-        int spawnPlace = Random.Range(0, SpawnRoad.Length);
+        int spawnPlace = UnityEngine.Random.Range(0, SpawnRoad.Length);
 
         for (int i = 0; i < blueprint.spawnList.Count; i++)
         {
@@ -557,6 +589,11 @@ public class Script_GameController : MonoBehaviour {
                 float waveLength = CalculateWaveLength();
                 timeToWave = waveLength;
                 yield return new WaitForSeconds(waveLength);
+            }
+            if (boss)
+            {
+                SpawnBoss();
+                waveNum += 1;
             }
         }
         else

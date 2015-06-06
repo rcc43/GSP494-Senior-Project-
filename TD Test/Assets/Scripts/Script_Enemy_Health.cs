@@ -108,6 +108,7 @@ public class Script_Enemy_Health : MonoBehaviour {
                     infocardData = infocard.GetComponent<Script_Infocard_Enemy>();
                     infocardData.health = this;
                     infocardData.movement = gameObject.GetComponent<Script_Enemy_Move>();
+                    infocardData.bossMove = gameObject.GetComponent<Script_BossMove>();
                     infocard.transform.SetParent(controller.UICanvas.transform);
                     drawingCard = true;
                 }

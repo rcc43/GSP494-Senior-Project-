@@ -165,9 +165,17 @@ public class Script_Tower : MonoBehaviour {
             {
                 float dist = Vector3.Distance(transform.position, tgt.transform.position);
                 Script_Enemy_Move tgtMove = tgt.GetComponent<Script_Enemy_Move>();
+                Script_BossMove bossMove = tgt.GetComponent<Script_BossMove>();
                 if (tgtMove != null)
                 {
                     if (dist < range && tgtMove.flying == canHitAir)
+                    {
+                        targets.Add(tgt);
+                    }
+                }
+                else if (bossMove != null)
+                {
+                    if (dist < range && canHitAir == false)
                     {
                         targets.Add(tgt);
                     }

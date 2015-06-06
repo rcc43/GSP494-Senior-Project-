@@ -53,6 +53,8 @@
      <Compile Include="Assets\Scripts\LevelLayout.cs" />
      <Compile Include="Assets\Scripts\Script_AreaEffect.cs" />
      <Compile Include="Assets\Scripts\Script_Base.cs" />
+     <Compile Include="Assets\Scripts\Script_BossFire.cs" />
+     <Compile Include="Assets\Scripts\Script_BossMove.cs" />
      <Compile Include="Assets\Scripts\Script_Briefing.cs" />
      <Compile Include="Assets\Scripts\Script_BuffList.cs" />
      <Compile Include="Assets\Scripts\Script_CampaignData.cs" />

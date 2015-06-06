@@ -66,6 +66,7 @@ public class Buff
         Script_Enemy_Health enemyStats = target.GetComponent<Script_Enemy_Health>(); //the health script for an enemy.
         Script_Tower towerStats = target.GetComponent<Script_Tower>(); //the script for a tower.
         Script_HostileWeapon enemyWeapon = target.GetComponent<Script_HostileWeapon>();
+        Script_BossMove bossMove = target.GetComponent<Script_BossMove>();
 
         if (duration > 0)
         {
@@ -84,6 +85,10 @@ public class Buff
                         if (enemyWeapon != null)
                         {
                             enemyWeapon.fireRate *= 1 + (magnitude / 100);
+                        }
+                        if (bossMove != null)
+                        {
+                            bossMove.speed *= ((100 - (magnitude)/2) / 100);
                         }
                     }
                     break;
@@ -145,6 +150,7 @@ public class Buff
         Script_Enemy_Health enemyStats = target.GetComponent<Script_Enemy_Health>();
         Script_Tower towerStats = target.GetComponent<Script_Tower>();
         Script_HostileWeapon enemyWeapon = target.GetComponent<Script_HostileWeapon>();
+        Script_BossMove bossMove = target.GetComponent<Script_BossMove>();
 
         switch (type)
         {
@@ -161,6 +167,10 @@ public class Buff
                     if (enemyWeapon != null)
                     {
                         enemyWeapon.fireRate *= (100 / (100 + magnitude) );
+                    }
+                    if (bossMove != null)
+                    {
+                        bossMove.speed *= (100 / (100 - (magnitude/2)));
                     }
                 }
                 break;
