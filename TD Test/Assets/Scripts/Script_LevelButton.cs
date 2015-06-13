@@ -54,6 +54,7 @@ public class Script_LevelButton : MonoBehaviour
         {
             CampaignData.isCampaign = true;
             CampaignData.campaignQueue = level.loadName;
+            CampaignData.enableBoss = level.enableBoss;
             Application.LoadLevel(level.loadName[0]);
         }
     }

@@ -32,36 +32,59 @@ public class Script_BossFire : MonoBehaviour
     {
         Quaternion spawnRot = Quaternion.identity;
         GameObject newEnemy;
-        newEnemy = Instantiate(missilePrefab, gameObject.transform.position, spawnRot) as GameObject;
+        newEnemy = Instantiate(missilePrefab, gameObject.transform.position + new Vector3(0.0f, -.2f, 0.0f), spawnRot) as GameObject;
         Script_Enemy_Move launchMove = newEnemy.GetComponent<Script_Enemy_Move>();
         if (launchMove != null)
         {
-            launchMove.aerialDisplacementTime = .1f;
-            launchMove.aerialDisplacementSpeed = 15;
+            launchMove.aerialDisplacementTime = .4f;
+            launchMove.aerialDisplacementSpeed = 4;
             launchMove.aerialDisplacementDir = new Vector3(0, 0, -1.0f);
         }
         controller.enemies.Add(newEnemy);
         controller.waveSize += 1;
 
-        newEnemy = Instantiate(missilePrefab, gameObject.transform.position, spawnRot) as GameObject;
+        newEnemy = Instantiate(missilePrefab, gameObject.transform.position + new Vector3(0.0f, -.2f, 0.0f), spawnRot) as GameObject;
         launchMove = newEnemy.GetComponent<Script_Enemy_Move>();
         if (launchMove != null)
         {
-            launchMove.aerialDisplacementTime = .1f;
-            launchMove.aerialDisplacementSpeed = 15;
+            launchMove.aerialDisplacementTime = .4f;
+            launchMove.aerialDisplacementSpeed = 4;
             launchMove.aerialDisplacementDir = new Vector3(-1.0f, 0, -1.0f);
         }
         controller.enemies.Add(newEnemy);
         controller.waveSize += 1;
 
 
-        newEnemy = Instantiate(missilePrefab, gameObject.transform.position, spawnRot) as GameObject;
+        newEnemy = Instantiate(missilePrefab, gameObject.transform.position + new Vector3(0.0f, -.2f, 0.0f), spawnRot) as GameObject;
         launchMove = newEnemy.GetComponent<Script_Enemy_Move>();
         if (launchMove != null)
         {
-            launchMove.aerialDisplacementTime = .3f;
-            launchMove.aerialDisplacementSpeed = 7;
+            launchMove.aerialDisplacementTime = .4f;
+            launchMove.aerialDisplacementSpeed = 4;
             launchMove.aerialDisplacementDir = new Vector3(1.0f, 0, -1.0f);
+        }
+        controller.enemies.Add(newEnemy);
+        controller.waveSize += 1;
+
+
+        newEnemy = Instantiate(missilePrefab, gameObject.transform.position + new Vector3(0.0f, -.2f, 0.0f), spawnRot) as GameObject;
+       launchMove = newEnemy.GetComponent<Script_Enemy_Move>();
+        if (launchMove != null)
+        {
+            launchMove.aerialDisplacementTime = .4f;
+            launchMove.aerialDisplacementSpeed = 4;
+            launchMove.aerialDisplacementDir = new Vector3(1.0f, 0, 0);
+        }
+        controller.enemies.Add(newEnemy);
+        controller.waveSize += 1;
+
+        newEnemy = Instantiate(missilePrefab, gameObject.transform.position + new Vector3(0.0f, -.2f, 0.0f), spawnRot) as GameObject;
+        launchMove = newEnemy.GetComponent<Script_Enemy_Move>();
+        if (launchMove != null)
+        {
+            launchMove.aerialDisplacementTime = .4f;
+            launchMove.aerialDisplacementSpeed = 4;
+            launchMove.aerialDisplacementDir = new Vector3(-1.0f, 0, 0);
         }
         controller.enemies.Add(newEnemy);
         controller.waveSize += 1;

@@ -64,6 +64,7 @@
      <Compile Include="Assets\Scripts\Script_Enemy_Health.cs" />
      <Compile Include="Assets\Scripts\Script_Enemy_Move.cs" />
      <Compile Include="Assets\Scripts\Script_GameController.cs" />
+     <Compile Include="Assets\Scripts\Script_GhostMine.cs" />
      <Compile Include="Assets\Scripts\Script_GhostTower.cs" />
      <Compile Include="Assets\Scripts\Script_Ground.cs" />
      <Compile Include="Assets\Scripts\Script_HealthBar.cs" />

@@ -58,6 +58,7 @@ public class Script_GameController : MonoBehaviour {
 
     public float winTimer = 0.0f;
     public bool win = false;
+    public bool winDisplayed = false;
 
     public int waveLimit = 5;
     public int waveSize = 0;
@@ -83,11 +84,12 @@ public class Script_GameController : MonoBehaviour {
 
     public Canvas UICanvas;
     public GameObject baseBar;
-    GameObject sidebar;
+    Text[] resourceIndicator;
     GameObject bottomBar;
     public GameObject healthBar_prefab;
     GameObject healthBar;
     public GameObject briefing;
+    public GameObject winMessage;
 
     int BuildButtons_X;
     public int BuildButtons_StartY;
@@ -114,21 +116,31 @@ public class Script_GameController : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-
         campaignSave = GameObject.FindWithTag("CampaignDataSave");
-        if (campaignSave)
-        {
-            campaignData = campaignSave.GetComponent<Script_CampaignData>();
-        }
-        if (campaignData)
-        {
-            campaign = campaignData.isCampaign;
-        }
+        Time.timeScale = 1.0f;
 
-        if (campaign && !demo)
+        if (!demo)
         {
-            Time.timeScale = 0.0f;
-            briefing.SetActive(true);
+            if (campaignSave)
+            {
+                campaignData = campaignSave.GetComponent<Script_CampaignData>();
+
+                if (campaignData)
+                {
+                    campaign = campaignData.isCampaign;
+                    if (campaign)
+                    {
+                        boss = campaignData.enableBoss[0];
+                    }
+                }
+            }
+
+            if (campaign)
+            {
+                Time.timeScale = 0.0f;
+                briefing.SetActive(true);
+                winMessage.SetActive(false);
+            }
         }
 
         ground = GameObject.FindGameObjectsWithTag("Ground");
@@ -143,17 +155,21 @@ public class Script_GameController : MonoBehaviour {
 
         if (!demo)
         {
+            /*
             sidebar = Instantiate(baseBar) as GameObject;
             RectTransform sideTrans = sidebar.GetComponent<RectTransform>();
             sideTrans.SetParent(UICanvas.transform);
             sideTrans.sizeDelta = new Vector2(sidebar_width, sidebar_height);
             sideTrans.anchoredPosition = new Vector2(Screen.width / 2 - (sidebar_width / 2) + 10, 0.0f);
+            
 
             bottomBar = Instantiate(baseBar) as GameObject;
             RectTransform botTrans = bottomBar.GetComponent<RectTransform>();
             botTrans.SetParent(UICanvas.transform);
             botTrans.sizeDelta = new Vector2(bottom_width, bottom_height);
             botTrans.anchoredPosition = new Vector2(0.0f, -(Screen.height / 2) + (bottom_height / 2) - 10);
+             * */
+            resourceIndicator = gameObject.GetComponentsInChildren<Text>();
 
             healthBar = Instantiate(healthBar_prefab) as GameObject;
             RectTransform healthTrans = healthBar.GetComponent<RectTransform>();
@@ -199,7 +215,7 @@ public class Script_GameController : MonoBehaviour {
             if (!win && waveNum == waveLimit + Convert.ToInt32(boss) && waveSize == 0 && enemies.Count == 0)
             {
                 win = true;
-                winTimer = 5.0f;
+                winTimer = 1.0f;
             }
         }
 
@@ -225,6 +241,12 @@ public class Script_GameController : MonoBehaviour {
 
         if (win)
         {
+            if (!winDisplayed)
+            {
+                winMessage.SetActive(true);
+                Time.timeScale = 0;
+                winDisplayed = true;
+            }
             winTimer -= Time.deltaTime;
             if (winTimer <= 0)
             {
@@ -234,6 +256,7 @@ public class Script_GameController : MonoBehaviour {
                     if (campaignData.campaignQueue.Count > 0)
                     {
                         campaignData.campaignQueue.RemoveAt(0);
+                        campaignData.enableBoss.RemoveAt(0);
                     }
                     if (campaignData.campaignQueue.Count > 0)
                     {
@@ -241,7 +264,7 @@ public class Script_GameController : MonoBehaviour {
                     }
                     else
                     {
-                        ResetLevel();
+                        Quit();
                     }
                 }
                 else
@@ -257,51 +280,54 @@ public class Script_GameController : MonoBehaviour {
                 Pause();
             }
         }
-	}
 
-    void OnGUI()
-    {
+        
         if (!demo)
         {
             if (!win)
             {
-
-                GUI.Label(new Rect(0.0f, 60.0f, 100.0f, 70.0f), "Enemies Left: " + waveSize.ToString("F0"));
+                //GUI.Label(new Rect(0.0f, 60.0f, 100.0f, 70.0f), "FPS: " + (1/Time.deltaTime).ToString("F1"))
+                resourceIndicator[5].text = "Enemies Left: " + waveSize.ToString("F0");
                 if (campaign)
                 {
-                    GUI.Label(new Rect(0.0f, 90.0f, 100.0f, 70.0f), "Waves Left: " + ((waveLimit + Convert.ToInt32(boss)) - waveNum).ToString("F0"));
+                    resourceIndicator[6].text = "Waves Left: " + ((waveLimit + Convert.ToInt32(boss)) - waveNum).ToString("F0");
                     if (waveNum < waveLimit + Convert.ToInt32(boss))
                     {
-                        GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+                        resourceIndicator[4].text = "Next wave in: " + timeToWave.ToString("F0");
                     }
                 }
                 else
                 {
-                    GUI.Label(new Rect(0.0f, 0.0f, 50.0f, 70.0f), "Next wave in: " + timeToWave.ToString("F0"));
+                    resourceIndicator[4].text = "Next wave in: " + timeToWave.ToString("F0");
                 }
                 if (insufficentResources == true)
                 {
-                    GUI.skin = debuffSkin;
+                    resourceIndicator[3].color = Color.red;
                 }
                 else
                 {
-                    GUI.skin = basicSkin;
+                    resourceIndicator[3].color = Color.black;
                 }
-                GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
+                resourceIndicator[3].text = "Resources: " + Resources.ToString();//GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
             }
 
             if (defeated)
             {
                 GUI.skin = failureSkin;
-                GUI.Label(new Rect((Screen.width /2) - 100 , Screen.height/2, 200.0f, 70.0f), "Base Destroyed!");
+                GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "Base Destroyed!");
             }
 
             if (win)
             {
                 GUI.skin = failureSkin;
-                GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "You Win!");
+                //GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "You Win!");
             }
         }
+	}
+
+    void OnGUI()
+    {
+  
     }
 
 

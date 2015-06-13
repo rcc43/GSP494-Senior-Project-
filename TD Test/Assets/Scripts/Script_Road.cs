@@ -5,6 +5,8 @@ public class Script_Road : MonoBehaviour {
 
     public int numBranches = 1; //the number of roads this one can lead to.
 
+    public GameObject mine;
+
     public GameObject[] next; //reference to next road piece in path.
     public float turnProximity = .25f; //the distance from the center an object must be to target the next road piece.
 

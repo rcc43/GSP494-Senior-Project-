@@ -47,7 +47,6 @@ public class Script_BossMove : MonoBehaviour
 	void Update ()
     {
         pauseTimer -= Time.deltaTime;
-        Debug.Log(Vector3.Distance(gameObject.transform.position, tgt));
         if (Vector3.Distance(gameObject.transform.position, tgt) < blitzRange)
         {
             if (pauseTimer <= 0)

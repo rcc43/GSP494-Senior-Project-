@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class Script_Briefing : MonoBehaviour
 {
-    Script_GameController controller;
+    public Script_GameController controller;
     public List<string> page;
     int pageNum = 0;
     Text text;
@@ -23,7 +23,6 @@ public class Script_Briefing : MonoBehaviour
         Button[] buttons = gameObject.GetComponentsInChildren<Button>();
         up = buttons[0];
         down = buttons[1];
-
 
         up.gameObject.SetActive(false);
         if (page.Count == 1)
