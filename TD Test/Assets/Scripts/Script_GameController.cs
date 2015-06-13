@@ -311,15 +311,9 @@ public class Script_GameController : MonoBehaviour {
                 resourceIndicator[3].text = "Resources: " + Resources.ToString();//GUI.Label(new Rect(650.0f, 540.0f, 80.0f, 70.0f), "Resources: " + Resources.ToString("F0"));
             }
 
-            if (defeated)
-            {
-                GUI.skin = failureSkin;
-                GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "Base Destroyed!");
-            }
-
             if (win)
             {
-                GUI.skin = failureSkin;
+                //GUI.skin = failureSkin;
                 //GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "You Win!");
             }
         }
@@ -327,6 +321,11 @@ public class Script_GameController : MonoBehaviour {
 
     void OnGUI()
     {
+        if (defeated)
+        {
+            GUI.skin = failureSkin;
+            GUI.Label(new Rect((Screen.width / 2) - 100, Screen.height / 2, 200.0f, 70.0f), "Base Destroyed!");
+        }
   
     }
 
