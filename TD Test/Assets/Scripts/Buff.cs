@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-public enum buffType : int { doNothing, EnemyReduceSpeedPercent, EnemyStun, TowerStun, DealDOT, TowerUpDamagePercent};
+public enum buffType : int { doNothing, EnemyReduceSpeedPercent, EnemyStun, TowerStun, DealDOT, TowerUpDamagePercent, damageHealthPercent};
 
 [Serializable]
 public class Buff
@@ -110,6 +110,7 @@ public class Buff
                     }
                 case buffType.DealDOT:
                     {
+                        //Debug.Log("Buff activated!");
                         if (enemyStats != null)
                         {
                             if (magnitude < 0)
@@ -123,10 +124,10 @@ public class Buff
                                     enemyStats.health = enemyStats.maxHealth;
                                 }
                             }
-                        }
-                        else
-                        {
-                            enemyStats.health -= magnitude;
+                            else
+                            {
+                                enemyStats.health -= magnitude;
+                            }
                         }
                         break;
                     }
@@ -135,6 +136,14 @@ public class Buff
                         if (towerStats != null)
                         {
                             towerStats.damage *= 1 + (magnitude / 100);
+                        }
+                        break;
+                    }
+                case buffType.damageHealthPercent:
+                    {
+                        if (enemyStats != null)
+                        {
+                            enemyStats.health -= enemyStats.maxHealth * (magnitude / 100);
                         }
                         break;
                     }
@@ -259,6 +268,11 @@ public class Buff
                     }
                     break;
                 }
+            case (buffType.damageHealthPercent):
+                    {
+                        answer = "Damage " + magnitude + "% of health"; 
+                    }
+                    break;
         }
         return answer;
     }

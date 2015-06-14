@@ -96,7 +96,7 @@ public class Script_GhostMine : MonoBehaviour
                             groundTarget.mine = newTower;
                             Destroy(gameObject);
                             controller.building = false;
-                            controller.GetTowers().Add(newTower);
+                            //controller.GetTowers().Add(newTower);
                         }
                     }
                 }

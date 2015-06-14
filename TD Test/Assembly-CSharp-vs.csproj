@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\Script_Colorize.cs" />
      <Compile Include="Assets\Scripts\Script_DemoGameController.cs" />
      <Compile Include="Assets\Scripts\Script_DestroyByContact.cs" />
+     <Compile Include="Assets\Scripts\Script_DishRotate.cs" />
      <Compile Include="Assets\Scripts\Script_Enemy_Health.cs" />
      <Compile Include="Assets\Scripts\Script_Enemy_Move.cs" />
      <Compile Include="Assets\Scripts\Script_GameController.cs" />
@@ -74,6 +75,7 @@
      <Compile Include="Assets\Scripts\Script_KillAfterTime.cs" />
      <Compile Include="Assets\Scripts\Script_LevelButton.cs" />
      <Compile Include="Assets\Scripts\Script_MenuController.cs" />
+     <Compile Include="Assets\Scripts\Script_Mine_Detonate.cs" />
      <Compile Include="Assets\Scripts\Script_Move.cs" />
      <Compile Include="Assets\Scripts\Script_Pause.cs" />
      <Compile Include="Assets\Scripts\Script_Road.cs" />

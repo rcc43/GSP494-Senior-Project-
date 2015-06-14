@@ -11,8 +11,10 @@ public class Script_AreaEffect : MonoBehaviour
 
     public Buff buff;
     public float range;
-    float fireRate = 1.0f;
+    public float fireRate = 1.0f;
     public float fireCounter = 0;
+
+    public bool holdFire = false;
 
     public targetType tgtClass;
 
@@ -26,11 +28,14 @@ public class Script_AreaEffect : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        fireCounter -= Time.deltaTime;
-        Fire();
+        if (!holdFire)
+        {
+            fireCounter -= Time.deltaTime;
+            Fire();
+        }
 	}
 
-    void Fire()
+    public void Fire()
     {
         List<GameObject> targets = new List<GameObject>();
         if (fireCounter <= 0.0f)
