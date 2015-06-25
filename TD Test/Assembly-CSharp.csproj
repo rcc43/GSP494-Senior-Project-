@@ -78,6 +78,7 @@
      <Compile Include="Assets\Scripts\Script_Mine_Detonate.cs" />
      <Compile Include="Assets\Scripts\Script_Move.cs" />
      <Compile Include="Assets\Scripts\Script_Pause.cs" />
+     <Compile Include="Assets\Scripts\Script_PlayMusic.cs" />
      <Compile Include="Assets\Scripts\Script_Road.cs" />
      <Compile Include="Assets\Scripts\Script_Shot.cs" />
      <Compile Include="Assets\Scripts\Script_Tower.cs" />
